@@ -1,3 +1,10 @@
+# Compiled binary
+ft_nm
+
+# Hidden folders
+.dep
+.obj
+
 # Prerequisites
 *.d
 
