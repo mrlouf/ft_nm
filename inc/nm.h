@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   nm.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrlouf                                     +#+  +:+       +#+        */
+/*   By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/10 13:57:00 by mrlouf           ###   ########.fr       */
+/*   Updated: 2026/02/10 16:59:16 by nponchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,16 @@ typedef struct s_nm
 	Elf64_Sym		*symtab;
 	char			*strtab;
 	int				symtab_size;
+
+	unsigned char	flags;
+	unsigned char	exit_code;
 }	t_nm;
 
 /*
 ** Function prototypes
 */
 
+int		nm_parse_args(int argc, char **argv, t_nm nm);
 int		nm_parse_elf(t_nm *nm);
 void	nm_print_symbols(t_nm *nm);
 void	nm_error(const char *msg);

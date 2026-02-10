@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrlouf                                     +#+  +:+       +#+        */
+/*   By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/10 13:57:00 by mrlouf           ###   ########.fr       */
+/*   Updated: 2026/02/10 16:59:26 by nponchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,11 @@ void	nm_print_symbols(t_nm *nm)
 	ft_printf("Symbol table printing not yet implemented\n");
 }
 
-static int	nm_process_file(const char *filename)
+static int	nm_process_file(const char *filename, t_nm nm)
 {
-	t_nm		nm;
 	int			fd;
 	struct stat	st;
 
-	ft_memset(&nm, 0, sizeof(t_nm));
 	nm.filename = (char *)filename;
 
 	fd = open(filename, O_RDONLY);
@@ -92,25 +90,26 @@ static int	nm_process_file(const char *filename)
 
 int	main(int argc, char **argv)
 {
-	int	i;
-	int	ret;
-
 	if (argc < 2)
 	{
 		ft_putendl_fd("Usage: ft_nm <file> [files...]", 2);
 		return (1);
 	}
 
-	ret = 0;
-	i = 1;
-	while (i < argc)
+	t_nm	nm;
+	ft_memset(&nm, 0, sizeof(t_nm));
+
+	nm_parse_args(argc, argv, nm);
+	nm_process_file(argv[1], nm);
+	
+/* 	while (i < argc)
 	{
 		if (argc > 2)
 			ft_printf("\n%s:\n", argv[i]);
 		if (nm_process_file(argv[i]) != 0)
 			ret = 1;
 		i++;
-	}
+	} */
 	
-	return (ret);
+	return (nm.exit_code);
 }

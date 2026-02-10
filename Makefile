@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mrlouf                                     +#+  +:+       +#+         #
+#    By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#              #
-#    Updated: 2026/02/10 13:57:00 by mrlouf           ###   ########.fr        #
+#    Updated: 2026/02/10 16:08:30 by nponchon         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,8 @@ SRC_DIR		= src
 INC_DIR		= inc
 LIBFT_DIR	= libft
 
-SRC		= main.c
+SRC			= main.c		\
+			parse.c
 
 SRCDIR		= src
 SRCS		= $(addprefix $(SRCDIR)/, $(SRC))
