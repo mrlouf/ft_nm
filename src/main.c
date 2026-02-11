@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/11 14:33:09 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/11 15:09:22 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ void	nm_error(const char *msg)
 
 void	nm_cleanup(t_nm *nm)
 {
+	// TODO: Unmap files, free memory, etc.
 	(void)nm;
 /* 	if (nm->file_data)
 		munmap(nm->file_data, nm->file_size); */
@@ -57,11 +58,11 @@ void	nm_print_symbols(t_nm *nm)
 
 int	main(int argc, char **argv)
 {
-	if (argc < 2)
+/* 	if (argc < 2)
 	{
 		ft_putendl_fd("Usage: ft_nm <file> [files...]", 2);
 		return (1);
-	}
+	} */
 
 	t_nm	nm;
 	ft_memset(&nm, 0, sizeof(t_nm));

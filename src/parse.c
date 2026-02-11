@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/11 15:00:55 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/11 15:13:01 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,23 @@ static void	parse_flags(int argc, char **argv, t_nm *nm)
 	ft_printf("[DEBUG] Number of files to process: %d\n", nm->file_count);
 }
 
+static void	get_default_filename(t_nm *nm)
+{
+	nm->files = malloc(sizeof(t_file) * 2); // 1 for a.out + 1 for NULL terminator
+	if (!nm->files)
+	{
+		ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
+		exit(1);
+	}
+	ft_bzero(nm->files, sizeof(t_file) * 2);
+	
+
+	nm->files[0].filename = "a.out";
+	ft_printf("[DEBUG] Parsed file: %s\n", nm->files[0].filename);
+
+	nm->files[1].filename = NULL;
+}
+
 static void	parse_files(int argc, char **argv, t_nm *nm)
 {
 	nm->files = malloc(sizeof(t_file) * (nm->file_count + 1));
@@ -85,7 +102,7 @@ static void	parse_files(int argc, char **argv, t_nm *nm)
 		exit(1);
 	}
 	ft_bzero(nm->files, sizeof(t_file) * (nm->file_count + 1));
-
+	
 	int i = 0;
 	while (i < nm->file_count)
 	{
@@ -99,7 +116,14 @@ static void	parse_files(int argc, char **argv, t_nm *nm)
 int	nm_parse_args(int argc, char **argv, t_nm *nm)
 {
 	parse_flags(argc, argv, nm);
-	parse_files(argc, argv, nm);
 
+	if (nm->file_count == 0) {
+		ft_printf("[DEBUG] No files specified, will default to a.out\n");
+		get_default_filename(nm);
+	}
+	else {
+		ft_printf("[DEBUG] Files to process: %d\n", nm->file_count);
+		parse_files(argc, argv, nm);
+	}
 	return (0);
 }
