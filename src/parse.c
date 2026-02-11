@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/11 16:36:47 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/11 16:43:54 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,8 +99,12 @@ static void	parse_files(char **argv, t_nm *nm)
 	
 	int i = 1;
 	int file_index = 0;
-	while (argv[i] && argv[i][0] != '-')
+	while (argv[i] )
 	{
+		if (argv[i][0] == '-') {
+			i++;
+			continue;
+		}
 		nm->files[file_index].filename = ft_strdup(argv[i]);
 		if (!nm->files[file_index].filename)
 		{
