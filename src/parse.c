@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/11 16:43:54 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/11 17:40:32 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,13 +77,7 @@ static void	get_default_filename(t_nm *nm)
 	}
 	ft_bzero(nm->files, sizeof(t_file) * 2);
 
-	nm->files[0].filename = ft_strdup("a.out");
-	if (!nm->files[0].filename)
-	{
-		ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
-		exit(1);
-	}
-
+	nm->files[0].filename = DEFAULT_FILENAME;
 	nm->files[1].filename = NULL;
 }
 
@@ -105,7 +99,7 @@ static void	parse_files(char **argv, t_nm *nm)
 			i++;
 			continue;
 		}
-		nm->files[file_index].filename = ft_strdup(argv[i]);
+		nm->files[file_index].filename = argv[i];
 		if (!nm->files[file_index].filename)
 		{
 			ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
@@ -118,7 +112,7 @@ static void	parse_files(char **argv, t_nm *nm)
 	nm->files[file_index].filename = NULL;
 }
 
-int	nm_parse_args(int argc, char **argv, t_nm *nm)
+void	nm_parse_args(int argc, char **argv, t_nm *nm)
 {
 	parse_flags(argc, argv, nm);
 
@@ -131,5 +125,4 @@ int	nm_parse_args(int argc, char **argv, t_nm *nm)
 		parse_files(argv, nm);
 	}
 
-	return (0);
 }

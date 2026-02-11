@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/11 14:32:09 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/11 17:41:38 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,11 @@
 # include <sys/mman.h>
 # include <sys/stat.h>
 # include <elf.h>
+# include <errno.h>
+
 # include "../libft/libft.h"
+
+# define DEFAULT_FILENAME "a.out"
 
 /*
 ** Data structures for nm
@@ -52,9 +56,8 @@ typedef struct s_nm
 ** Function prototypes
 */
 
-int		nm_parse_args(int argc, char **argv, t_nm *nm);
-int		nm_process_files(t_nm *nm);
-int		nm_parse_elf(t_nm *nm);
+void	nm_parse_args(int argc, char **argv, t_nm *nm);
+void	nm_process_files(t_nm *nm);
 void	nm_print_symbols(t_nm *nm);
 void	nm_error(const char *msg);
 void	nm_cleanup(t_nm *nm);
