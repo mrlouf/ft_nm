@@ -1,5 +1,6 @@
 # Global notes about the project
 
+- 'nm' stands for 'name list' according to Wikipedia, which was the name used before 'symbol table' became the standard term. 
 - nm handles unlimited number of files, and should not crash if a file is not valid.
 - if a file is not valid, an error message should be printed to stderr, and the program should continue with the next file. The return value should be 1 if at least one file is not valid, and 0 otherwise.
 

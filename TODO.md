@@ -1,0 +1,3 @@
+- Handle file permissions and errors gracefully, ensuring that the program continues processing subsequent files even if one fails.
+- Check return values against the real nm
+- Check leaks with valgrind
