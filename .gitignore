@@ -1,6 +1,9 @@
 # Compiled binary
 ft_nm
 
+# Test folder
+test_files/
+
 # Hidden folders
 .dep
 .obj

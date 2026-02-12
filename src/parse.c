@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/11 17:40:32 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/12 11:12:28 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,11 @@ static void	parse_flags(int argc, char **argv, t_nm *nm)
 				nm->flags |= 0x10; // Do not sort
 			else
 			{
+				ft_putstr_fd(RED, 2);
 				ft_putstr_fd("ft_nm: invalid option -- '", 2);
 				ft_putchar_fd(argv[i][j], 2);
 				ft_putendl_fd("'", 2);
+				ft_putstr_fd(RESET, 2);
 				print_usage();
 			}
 			j++;
@@ -117,7 +119,7 @@ void	nm_parse_args(int argc, char **argv, t_nm *nm)
 	parse_flags(argc, argv, nm);
 
 	if (nm->file_count == 0) {
-		ft_printf("[DEBUG] No files specified, will default to a.out\n");
+		ft_printf("%s[DEBUG] No files specified, will default to a.out%s\n", YELLOW, RESET);
 		get_default_filename(nm);
 	}
 	else {

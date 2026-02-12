@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/11 17:41:38 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/12 13:03:51 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,14 @@
 # include <errno.h>
 
 # include "../libft/libft.h"
+
+# define YELLOW "\033[33m"
+# define RED "\033[31m"
+# define GREEN "\033[32m"
+# define BLUE "\033[34m"
+# define MAGENTA "\033[35m"
+# define CYAN "\033[36m"
+# define RESET "\033[0m"
 
 # define DEFAULT_FILENAME "a.out"
 
@@ -59,6 +67,8 @@ typedef struct s_nm
 void	nm_parse_args(int argc, char **argv, t_nm *nm);
 void	nm_process_files(t_nm *nm);
 void	nm_print_symbols(t_nm *nm);
+int		check_elf_magic(Elf64_Ehdr *ehdr);
+void	nm_unmap_file(t_file *file);
 void	nm_error(const char *msg);
 void	nm_cleanup(t_nm *nm);
 

@@ -6,7 +6,7 @@
 #    By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#              #
-#    Updated: 2026/02/11 17:54:22 by nicolas          ###   ########.fr        #
+#    Updated: 2026/02/12 13:02:21 by nicolas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,7 @@ LIBFT_DIR	= libft
 SRC			= main.c		\
 			parse.c			\
 			process.c		\
+			utils.c
 
 SRCDIR		= src
 SRCS		= $(addprefix $(SRCDIR)/, $(SRC))
@@ -33,7 +34,7 @@ DEPDIRS		= $(DEPDIR)
 LIBFT		= $(LIBFT_DIR)/libft.a
 
 CC			= cc
-CFLAGS		= -Wall -Wextra -Werror -g -fsanitize=address
+CFLAGS		= -Wall -Wextra -Werror -g# -fsanitize=address
 INCLUDES	= -I$(INC_DIR) -I$(LIBFT_DIR)
 LDFLAGS		= -L$(LIBFT_DIR) -lft
 DFLAGS		= -MT $@ -MMD -MP
