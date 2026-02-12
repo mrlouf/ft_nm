@@ -6,11 +6,27 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/12 13:00:09 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/12 13:03:40 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/12 14:31:01 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/nm.h"
+
+/* t_symbol *add_symbol(t_symbol **head, Elf64_Sym *elf_sym, 
+                     char *str_table, Elf64_Shdr *shdr_table, 
+                     Elf64_Ehdr *ehdr) {
+    t_symbol *new = malloc(sizeof(t_symbol));
+    if (!new)
+        return NULL;
+    
+    new->value = elf_sym->st_value;
+    new->type = get_symbol_type(elf_sym, shdr_table, ehdr);
+    new->name = str_table + elf_sym->st_name;  // Pas de strdup !
+    new->next = *head;
+    
+    *head = new;
+    return new;
+} */
 
 int	check_elf_magic(Elf64_Ehdr *ehdr)
 {

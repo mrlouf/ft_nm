@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/12 13:03:51 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/12 14:34:54 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,13 @@
 ** Data structures for nm
 */
 
+typedef struct s_symbol {
+    uint64_t        value;
+    char            type;
+    char            *name;
+    struct s_symbol *next;
+} t_symbol;
+
 typedef struct s_file
 {
 	char	*filename;
@@ -49,6 +56,8 @@ typedef struct s_file
 	Elf64_Sym		*symtab;
 	char			*strtab;
 	int				symtab_size;
+	t_symbol		*symbols;
+	
 }	t_file;
 
 typedef struct s_nm
@@ -71,5 +80,8 @@ int		check_elf_magic(Elf64_Ehdr *ehdr);
 void	nm_unmap_file(t_file *file);
 void	nm_error(const char *msg);
 void	nm_cleanup(t_nm *nm);
+
+// Symbol list management
+
 
 #endif

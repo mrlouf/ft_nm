@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/12 13:04:30 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/12 14:31:41 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,11 +95,14 @@ static int	extract_file_data(t_file *file)
 	return (0);
 }
 
-static void extract_symbols(t_file *file, t_nm *nm)
+static t_symbol *extract_symbols(t_file *file)
 {
-	(void)file;
-	(void)nm;
-	ft_printf("%s[DEBUG] Symbol extraction not yet implemented for file: %s%s\n", YELLOW, file->filename, RESET);
+	t_symbol *symbols = NULL;
+
+	ft_putstr_fd(BLUE, 1); ft_printf("[DEBUG] Extracting symbols from file: %s\n", file->filename);
+	
+
+	return (symbols);
 }
 
 void nm_process_files(t_nm *nm)
@@ -112,16 +115,17 @@ void nm_process_files(t_nm *nm)
 		ft_printf("%s[DEBUG] Processing file: %s%s\n", GREEN, nm->files[i].filename, RESET);
 		if (extract_file_data(&nm->files[i]) != 0 || parse_elf_headers(&nm->files[i]) != 0)
 		{
+			if (nm->files[i].data != NULL)
+				nm_unmap_file(&nm->files[i]);
 			nm->exit_code = 1;
 			i++;
 			continue;
 		}
 
 		// Process the file (e.g., extract symbol table)
-		extract_symbols(&nm->files[i], nm);
-		
-		// Clean-up
+		nm->files[i].symbols = extract_symbols(&nm->files[i]);
 
+		nm_unmap_file(&nm->files[i]);
 
 		i++;
 	}
