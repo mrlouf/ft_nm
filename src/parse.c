@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/12 11:12:28 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/12 19:47:38 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,15 +40,15 @@ static void	parse_flags(int argc, char **argv, t_nm *nm)
 		while (argv[i][j] != '\0')
 		{
 			if (argv[i][j] == 'a')
-				nm->flags |= 0x01; // Display all symbols, even debugger-only symbols
+				nm->flags |= FLAG_A; // Display all symbols, even debugger-only symbols
 			else if (argv[i][j] == 'g')
-				nm->flags |= 0x02; // Only external symbols
+				nm->flags |= FLAG_G; // Only external symbols
 			else if (argv[i][j] == 'u')
-				nm->flags |= 0x04; // Sort by address
+				nm->flags |= FLAG_U; // Undefined symbols only
 			else if (argv[i][j] == 'r')
-				nm->flags |= 0x08; // Sort in reverse order
+				nm->flags |= FLAG_R; // Sort in reverse order
 			else if (argv[i][j] == 'p')
-				nm->flags |= 0x10; // Do not sort
+				nm->flags |= FLAG_P; // Do not sort: display in symbol table order
 			else
 			{
 				ft_putstr_fd(RED, 2);
@@ -65,8 +65,8 @@ static void	parse_flags(int argc, char **argv, t_nm *nm)
 		j = 1;
 	}
 	nm->file_count = argc - total_flags - 1;
-	ft_printf("[DEBUG] Number of flags: %d\n", total_flags);
-	ft_printf("[DEBUG] Number of files to process: %d\n", nm->file_count);
+/* 	ft_printf("[DEBUG] Number of flags: %d\n", total_flags);
+	ft_printf("[DEBUG] Number of files to process: %d\n", nm->file_count); */
 }
 
 static void	get_default_filename(t_nm *nm)
@@ -95,7 +95,7 @@ static void	parse_files(char **argv, t_nm *nm)
 	
 	int i = 1;
 	int file_index = 0;
-	while (argv[i] )
+	while (argv[i])
 	{
 		if (argv[i][0] == '-') {
 			i++;
@@ -107,7 +107,7 @@ static void	parse_files(char **argv, t_nm *nm)
 			ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
 			exit(1);
 		}
-		ft_printf("[DEBUG] Parsed file: %s\n", nm->files[file_index].filename);
+		// ft_printf("[DEBUG] Parsed file: %s\n", nm->files[file_index].filename);
 		i++;
 		file_index++;
 	}
@@ -119,11 +119,11 @@ void	nm_parse_args(int argc, char **argv, t_nm *nm)
 	parse_flags(argc, argv, nm);
 
 	if (nm->file_count == 0) {
-		ft_printf("%s[DEBUG] No files specified, will default to a.out%s\n", YELLOW, RESET);
+		// ft_printf("%s[DEBUG] No files specified, will default to a.out%s\n", YELLOW, RESET);
 		get_default_filename(nm);
 	}
 	else {
-		ft_printf("[DEBUG] Files to process: %d\n", nm->file_count);
+		// ft_printf("[DEBUG] Files to process: %d\n", nm->file_count);
 		parse_files(argv, nm);
 	}
 

@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/12 17:59:04 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/12 19:43:09 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,12 @@
 # define RESET "\033[0m"
 
 # define DEFAULT_FILENAME "a.out"
+
+# define FLAG_A 0x01 // Display all symbols, even debugger-only symbols # define FLAG_G 0x02 // Only external symbols # define FLAG_U 0x04 // Undefined symbols only # define FLAG_R 0x08 // Sort in reverse order # define FLAG_P 0x10 // Do not sort: display in symbol table order
+# define FLAG_G 0x02 // Only external symbols # define FLAG_U 0x04 // Undefined symbols only # define FLAG_R 0x08 // Sort in reverse order # define FLAG_P 0x10 // Do not sort: display in symbol table order
+# define FLAG_U 0x04 // Undefined symbols only # define FLAG_R 0x08 // Sort in reverse order # define FLAG_P 0x10 // Do not sort: display in symbol table order # define FLAG_R 0x08 // Sort in reverse order # define FLAG_P 0x10 // Do not sort: display in symbol table order # define FLAG_P 0x10 // Do not sort: display in symbol table order
+# define FLAG_R 0x08 // Sort in reverse order # define FLAG_P 0x10 // Do not sort: display in symbol table order # define FLAG_P 0x10 // Do not sort: display in symbol table order
+# define FLAG_P 0x10 // Do not sort: display in symbol table order
 
 /*
 ** Data structures for nm
