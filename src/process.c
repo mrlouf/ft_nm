@@ -6,12 +6,11 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/12 14:31:41 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/12 18:53:31 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/nm.h"
-
 
 static int	parse_elf_headers(t_file *file)
 {
@@ -95,14 +94,164 @@ static int	extract_file_data(t_file *file)
 	return (0);
 }
 
-static t_symbol *extract_symbols(t_file *file)
+static void find_symtab(t_file *file)
 {
-	t_symbol *symbols = NULL;
-
-	ft_putstr_fd(BLUE, 1); ft_printf("[DEBUG] Extracting symbols from file: %s\n", file->filename);
+	file->shdr = (Elf64_Shdr *)(file->data + file->ehdr->e_shoff);
+	file->strtab = (char *)(file->data + file->shdr[file->ehdr->e_shstrndx].sh_offset);
 	
+	for (int i = 0; i < file->ehdr->e_shnum; i++)
+	{
+		const char *section_name = file->strtab + file->shdr[i].sh_name;
+		//ft_printf("[DEBUG] Section %d: %s\n", i, section_name);
+		if (file->shdr[i].sh_type == SHT_SYMTAB) { 
+			ft_printf("%s[DEBUG] Found symbol table in section: %s%s\n", GREEN, section_name, RESET);
+			file->symtab = (Elf64_Sym *)(file->data + file->shdr[i].sh_offset);
+			file->symtab_size = file->shdr[i].sh_size / sizeof(Elf64_Sym);
+			file->strtab = (char *)(file->data + file->shdr[file->shdr[i].sh_link].sh_offset);
+			return;
+		}
+	}
+	ft_putstr_fd(YELLOW, 1);
+	ft_printf("[DEBUG] No symbol table found in file: %s%s\n", file->filename, RESET);
+}
 
-	return (symbols);
+static void add_symbol_to_file(t_file *file, t_symbol *symbol)
+{
+	t_symbol_node *new_node = malloc(sizeof(t_symbol_node));
+	if (!new_node)
+	{
+		ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
+		exit(1);
+	}
+	new_node->symbol = *symbol;
+	new_node->next = NULL;
+	
+	if (file->symbols.head == NULL)	{
+		
+		file->symbols.head = new_node;
+	} 
+	else {
+		
+		t_symbol_node *current = file->symbols.head;
+		
+		while (current->next != NULL) {
+			current = current->next;
+		}
+		current->next = new_node;
+	}
+	file->symbols.count++;
+}
+
+static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *ehdr) {
+
+    unsigned char bind = ELF64_ST_BIND(sym->st_info);
+    unsigned char type = ELF64_ST_TYPE(sym->st_info);
+    Elf64_Half shndx = sym->st_shndx;
+    char c;
+    
+    if (shndx == SHN_UNDEF) {
+        return 'U';
+    }
+    if (shndx == SHN_ABS) {
+        c = 'A';
+    }
+    else if (shndx == SHN_COMMON) {
+        c = 'C';
+    }
+
+    else if (shndx < ehdr->e_shnum) {
+        Elf64_Shdr *section = &shdr_table[shndx];
+        
+        if (section->sh_type == SHT_NOBITS) {
+            // BSS
+            c = 'B';
+        }
+        else if (section->sh_flags & SHF_EXECINSTR) {
+            c = 'T';
+        }
+        else if (section->sh_flags & SHF_WRITE) {
+            c = 'D';
+        }
+        else if (section->sh_flags & SHF_ALLOC) {
+            c = 'R';
+        }
+        else {
+            c = 'N';
+        }
+    }
+    else {
+        c = '?';
+    }
+    
+    if (bind == STB_WEAK) {
+        if (shndx == SHN_UNDEF)
+            c = 'w';
+        else if (type == STT_OBJECT)
+            c = 'V';
+        else
+            c = 'W';
+    }
+    
+    if (bind == STB_LOCAL && c != 'U' && c != 'w')
+        c = ft_tolower(c);
+    
+    return c;
+}
+
+static void extract_symbols(t_file *file)
+{
+	ft_putstr_fd(BLUE, 1);
+	ft_printf("[DEBUG] Extracting symbols from file: %s\n", file->filename);
+
+	find_symtab(file);
+	
+	for (int i = 0; i < file->symtab_size; i++)
+	{
+		Elf64_Sym *sym = &file->symtab[i];
+		
+        if (sym->st_name == 0)
+            continue;
+        
+        char *name = file->strtab + sym->st_name;
+        if (name[0] == '\0')
+            continue;
+        
+        // Filtrer les symboles de compilation (optionnel)
+/*         if (should_skip_symbol(name))
+            continue; */
+
+		t_symbol symbol;
+        symbol.value = sym->st_value;
+        symbol.name = name;  // Pointe directement dans le mapping
+        symbol.type = get_symbol_type(sym, file->shdr, file->ehdr);
+        symbol.size = sym->st_size;
+        symbol.bind = ELF64_ST_BIND(sym->st_info);
+        symbol.sym_type = ELF64_ST_TYPE(sym->st_info);
+		add_symbol_to_file(file, &symbol);
+
+	}
+	ft_putstr_fd(RESET, 1);
+}
+
+static void print_symbols(t_file *file)
+{
+	ft_putstr_fd(CYAN, 1);
+	ft_printf("[DEBUG] Printing symbols for file: %s\n", file->filename);
+	t_symbol_node *current = file->symbols.head;
+
+	while (current != NULL) {
+
+		t_symbol *sym = &current->symbol;
+
+		if (sym->value != 0)
+			printf("%016lx %c %s\n", sym->value, sym->type, sym->name);
+		else
+			printf("%16s %c %s\n", "", sym->type, sym->name);
+		
+		current = current->next;
+	}
+		
+	ft_putstr_fd(RESET, 1);
 }
 
 void nm_process_files(t_nm *nm)
@@ -123,7 +272,8 @@ void nm_process_files(t_nm *nm)
 		}
 
 		// Process the file (e.g., extract symbol table)
-		nm->files[i].symbols = extract_symbols(&nm->files[i]);
+		extract_symbols(&nm->files[i]);
+		print_symbols(&nm->files[i]);
 
 		nm_unmap_file(&nm->files[i]);
 

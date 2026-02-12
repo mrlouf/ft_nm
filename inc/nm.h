@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/12 14:34:54 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/12 17:59:04 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,29 @@
 */
 
 typedef struct s_symbol {
+
     uint64_t        value;
     char            type;
     char            *name;
+
+	// Optionalfields for sorting and printing
+	uint64_t    	size;
+    unsigned char 	bind;
+    unsigned char 	sym_type;
+	
     struct s_symbol *next;
-} t_symbol;
+
+}	t_symbol;
+
+typedef struct s_symbol_node {
+    t_symbol            symbol;
+    struct s_symbol_node *next;
+}	t_symbol_node;
+
+typedef struct s_symbol_list {
+    t_symbol_node   *head;
+    size_t          count;
+}	t_symbol_list;
 
 typedef struct s_file
 {
@@ -56,7 +74,7 @@ typedef struct s_file
 	Elf64_Sym		*symtab;
 	char			*strtab;
 	int				symtab_size;
-	t_symbol		*symbols;
+	t_symbol_list	symbols;
 	
 }	t_file;
 
