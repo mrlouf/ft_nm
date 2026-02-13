@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/12 19:47:38 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/13 17:27:31 by nponchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,16 +39,29 @@ static void	parse_flags(int argc, char **argv, t_nm *nm)
 		}
 		while (argv[i][j] != '\0')
 		{
-			if (argv[i][j] == 'a')
+			if (argv[i][j] == 'a') {
 				nm->flags |= FLAG_A; // Display all symbols, even debugger-only symbols
-			else if (argv[i][j] == 'g')
+				nm->flags &= ~FLAG_G; // Disable extern only if display all is set
+				nm->flags &= ~FLAG_U; // Disable undefined only if display all is set
+			}
+			else if (argv[i][j] == 'g') {
 				nm->flags |= FLAG_G; // Only external symbols
-			else if (argv[i][j] == 'u')
+				nm->flags &= ~FLAG_A; // Disable display all if extern only is set
+				nm->flags &= ~FLAG_U; // Disable undefined only if extern only is set
+			}
+			else if (argv[i][j] == 'u') {
 				nm->flags |= FLAG_U; // Undefined symbols only
-			else if (argv[i][j] == 'r')
+				nm->flags &= ~FLAG_A; // Disable display all if undefined only is set
+				nm->flags &= ~FLAG_G; // Disable extern only if undefined only is set
+			}
+			else if (argv[i][j] == 'r') {
 				nm->flags |= FLAG_R; // Sort in reverse order
-			else if (argv[i][j] == 'p')
+				nm->flags &= ~FLAG_P; // Disable no sort if reverse is set
+			}
+			else if (argv[i][j] == 'p') {
 				nm->flags |= FLAG_P; // Do not sort: display in symbol table order
+				nm->flags &= ~FLAG_R; // Disable reverse sort if no sort is set
+			}
 			else
 			{
 				ft_putstr_fd(RED, 2);
@@ -73,10 +86,8 @@ static void	get_default_filename(t_nm *nm)
 {
 	nm->files = malloc(sizeof(t_file) * 2); // 1 for a.out + 1 for NULL terminator
 	if (!nm->files)
-	{
-		ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
-		exit(1);
-	}
+		nm_error("memory allocation failed");
+
 	ft_bzero(nm->files, sizeof(t_file) * 2);
 
 	nm->files[0].filename = DEFAULT_FILENAME;
@@ -87,10 +98,8 @@ static void	parse_files(char **argv, t_nm *nm)
 {
 	nm->files = malloc(sizeof(t_file) * (nm->file_count + 1));
 	if (!nm->files)
-	{
-		ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
-		exit(1);
-	}
+		nm_error("memory allocation failed");
+	
 	ft_bzero(nm->files, sizeof(t_file) * (nm->file_count + 1));
 	
 	int i = 1;
@@ -103,10 +112,8 @@ static void	parse_files(char **argv, t_nm *nm)
 		}
 		nm->files[file_index].filename = argv[i];
 		if (!nm->files[file_index].filename)
-		{
-			ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
-			exit(1);
-		}
+			nm_error("memory allocation failed");
+
 		// ft_printf("[DEBUG] Parsed file: %s\n", nm->files[file_index].filename);
 		i++;
 		file_index++;

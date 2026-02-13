@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/12 13:00:09 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/12 14:31:01 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/13 16:28:37 by nponchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,14 @@ void	nm_cleanup(t_nm *nm)
 	int i = 0;
     while (nm->files[i].filename != NULL)
     {
-        if (nm->files[i].data != NULL)
-            munmap(nm->files[i].data, nm->files[i].size);
+		t_symbol_node *current = nm->files[i].symbols.head;
+		while (current != NULL) {
+			t_symbol_node *tmp = current;
+			current = current->next;
+			free(tmp);
+		}
+/*         if (nm->files[i].data != NULL)
+            munmap(nm->files[i].data, nm->files[i].size); */
         i++;
     }
     free(nm->files);

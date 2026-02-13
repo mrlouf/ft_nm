@@ -8,9 +8,10 @@
 
 ## Bonus
 
-- the following flags are supported:
-  - `-a` to show all symbols, including local and debugging symbols.
-  - `-g` to show only debugging symbols.
-  - `-u` to show only undefined symbols.
-  - `-r` to show in the reverse order they are found.
-  - `-p` to show symbols in the order they appear in the symbol table (ie. no sorting).
+The following flags are supported:
+
+- `-a` : Display all symbols, even debugger-only symbols; normally these are not listed.
+- `-g` : Display only external symbols.
+- `-u` : Display only undefined symbols (those external to each object file). By default both defined and undefined symbols are displayed.
+- `-r` : Reverse the order of the sort (whether numeric or alphabetic); let the last come first.
+- `-p` : Do not bother to sort the symbols in any order; print them in the order encountered.

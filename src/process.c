@@ -6,7 +6,7 @@
 /*   By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/13 10:54:09 by nponchon         ###   ########.fr       */
+/*   Updated: 2026/02/13 17:40:23 by nponchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,9 @@ static void find_symtab(t_file *file)
 {
 	file->shdr = (Elf64_Shdr *)(file->data + file->ehdr->e_shoff);
 	file->strtab = (char *)(file->data + file->shdr[file->ehdr->e_shstrndx].sh_offset);
-	
-	for (int i = 0; i < file->ehdr->e_shnum; i++)
+	int i = 0;
+
+	while (i < file->ehdr->e_shnum)
 	{
 		// const char *section_name = file->strtab + file->shdr[i].sh_name;
 		//ft_printf("[DEBUG] Section %d: %s\n", i, section_name);
@@ -110,6 +111,7 @@ static void find_symtab(t_file *file)
 			file->strtab = (char *)(file->data + file->shdr[file->shdr[i].sh_link].sh_offset);
 			return;
 		}
+		i++;
 	}
 /* 	ft_putstr_fd(YELLOW, 1);
 	ft_printf("[DEBUG] No symbol table found in file: %s%s\n", file->filename, RESET); */
@@ -238,6 +240,20 @@ static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 	return 0;
 }
 
+static void sort_symbols(t_symbol_list *list, unsigned char flags)
+{
+	if (flags & FLAG_P) {
+		printf("%s[DEBUG] No sorting, displaying symbols in symbol table order%s\n", YELLOW, RESET);
+		return; // No sort, keep original order
+	}
+
+	
+
+	if (flags & FLAG_R) {
+		printf("%s[DEBUG] Sorting symbols in reverse order%s\n", YELLOW, RESET);
+	}
+}
+
 static void print_symbols(t_file *file, unsigned char flags)
 {
 	// ft_putstr_fd(CYAN, 1);
@@ -245,10 +261,12 @@ static void print_symbols(t_file *file, unsigned char flags)
 	t_symbol_node *current = file->symbols.head;
 
 	// TODO : implement sorting based on flags (default sort, reverse order, no sort)
-	// Default sort: by symbol name (ASCII order, use ft_strcmp)
+	// Default sort: by symbol name (ASCII order, trim '_', use ft_strcmp)
 	// Reverse order: same as default but in reverse
 	// No sort: print in the order they appear in the symbol table (already the case with linked list)
 	
+	sort_symbols(&file->symbols, flags);
+
 	while (current != NULL) {
 
 		t_symbol *sym = &current->symbol;
