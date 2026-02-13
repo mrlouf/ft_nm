@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/13 17:40:23 by nponchon         ###   ########.fr       */
+/*   Updated: 2026/02/13 20:57:49 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,7 +247,7 @@ static void sort_symbols(t_symbol_list *list, unsigned char flags)
 		return; // No sort, keep original order
 	}
 
-	
+	(void)list; // Placeholder to avoid unused parameter warning
 
 	if (flags & FLAG_R) {
 		printf("%s[DEBUG] Sorting symbols in reverse order%s\n", YELLOW, RESET);
