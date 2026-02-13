@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/12 19:49:37 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/13 10:32:26 by nponchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,15 +149,13 @@ static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *
     Elf64_Half shndx = sym->st_shndx;
     char c;
     
-    if (shndx == SHN_UNDEF)
+    if (shndx == SHN_UNDEF && bind != STB_WEAK)
         return 'U';
     if (shndx == SHN_ABS)
         c = 'A';
     else if (shndx == SHN_COMMON)
         c = 'C';
-
     else if (shndx < ehdr->e_shnum) {
-
         Elf64_Shdr *section = &shdr_table[shndx];
         if (section->sh_type == SHT_NOBITS)
             c = 'B';
@@ -173,7 +171,6 @@ static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *
     else {
         c = '?';
     }
-    
     if (bind == STB_WEAK) {
         if (shndx == SHN_UNDEF)
             c = 'w';
@@ -195,6 +192,10 @@ static void extract_symbols(t_file *file)
 	// ft_printf("[DEBUG] Extracting symbols from file: %s\n", file->filename);
 
 	find_symtab(file);
+	if (file->symtab == NULL) {
+		ft_printf("ft_nm: %s: no symbol\n", file->filename);
+		return ;
+	}
 	
 	for (int i = 0; i < file->symtab_size; i++)
 	{
