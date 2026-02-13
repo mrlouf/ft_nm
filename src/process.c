@@ -6,7 +6,7 @@
 /*   By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/13 10:32:26 by nponchon         ###   ########.fr       */
+/*   Updated: 2026/02/13 10:54:09 by nponchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,29 +115,32 @@ static void find_symtab(t_file *file)
 	ft_printf("[DEBUG] No symbol table found in file: %s%s\n", file->filename, RESET); */
 }
 
-static void add_symbol_to_file(t_file *file, t_symbol *symbol)
+static void add_symbol_to_file(t_file *file, t_symbol *symbol, unsigned char flags)
 {
 	t_symbol_node *new_node = malloc(sizeof(t_symbol_node));
 	if (!new_node)
-	{
-		ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
-		exit(1);
-	}
+		nm_error("malloc failed");
+
 	new_node->symbol = *symbol;
 	new_node->next = NULL;
 	
 	if (file->symbols.head == NULL)	{
-		
 		file->symbols.head = new_node;
-	} 
+	}
 	else {
-		
 		t_symbol_node *current = file->symbols.head;
-		
-		while (current->next != NULL) {
-			current = current->next;
+
+		if (flags & FLAG_R) {
+			// Reverse order: insert at the beginning
+			new_node->next = file->symbols.head;
+			file->symbols.head = new_node;
+		} else {
+			// Default order: insert at the end
+			while (current->next != NULL) {
+				current = current->next;
+			}
+			current->next = new_node;
 		}
-		current->next = new_node;
 	}
 	file->symbols.count++;
 }
@@ -186,7 +189,7 @@ static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *
     return c;
 }
 
-static void extract_symbols(t_file *file)
+static void extract_symbols(t_file *file, unsigned char flags)
 {
 	// ft_putstr_fd(BLUE, 1);
 	// ft_printf("[DEBUG] Extracting symbols from file: %s\n", file->filename);
@@ -215,7 +218,7 @@ static void extract_symbols(t_file *file)
         symbol.size = sym->st_size;
         symbol.bind = ELF64_ST_BIND(sym->st_info);
         symbol.sym_type = ELF64_ST_TYPE(sym->st_info);
-		add_symbol_to_file(file, &symbol);
+		add_symbol_to_file(file, &symbol, flags);
 
 	}
 	// ft_putstr_fd(RESET, 1);
@@ -256,6 +259,7 @@ static void print_symbols(t_file *file, unsigned char flags)
 			continue;
 		}
 		if (sym->value != 0)
+		// TODO - replace printf call by a helper function allowed by the subject
 			printf("%016lx %c %s\n", sym->value, sym->type, sym->name);
 		else
 			printf("%16s %c %s\n", "", sym->type, sym->name);
@@ -283,7 +287,7 @@ void nm_process_files(t_nm *nm)
 			continue;
 		}
 
-		extract_symbols(&nm->files[i]);
+		extract_symbols(&nm->files[i], nm->flags);
 		print_symbols(&nm->files[i], nm->flags);
 		nm_unmap_file(&nm->files[i]);
 		i++;

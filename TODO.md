@@ -9,3 +9,7 @@
 // 4. Vérifier que e_shoff ne dépasse pas la taille du fichier
 
 Fichier corrompu?
+
+- Investigate whether flag -a needs to print the value or not, and if nameless symbols should be printed as well.
+
+- TODO for the reverse sort: simply add the symbol to the front of the list instead of the back. This saves a reversing and/or sorting step.

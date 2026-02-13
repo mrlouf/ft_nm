@@ -12,5 +12,5 @@
   - `-a` to show all symbols, including local and debugging symbols.
   - `-g` to show only debugging symbols.
   - `-u` to show only undefined symbols.
-  - `-r` to show only defined symbols.
-  - `-p` to show only the symbol names, without addresses or types.
+  - `-r` to show in the reverse order they are found.
+  - `-p` to show symbols in the order they appear in the symbol table (ie. no sorting).
