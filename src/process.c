@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/13 20:57:49 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/15 14:43:14 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,32 +240,14 @@ static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 	return 0;
 }
 
-static void sort_symbols(t_symbol_list *list, unsigned char flags)
-{
-	if (flags & FLAG_P) {
-		printf("%s[DEBUG] No sorting, displaying symbols in symbol table order%s\n", YELLOW, RESET);
-		return; // No sort, keep original order
-	}
-
-	(void)list; // Placeholder to avoid unused parameter warning
-
-	if (flags & FLAG_R) {
-		printf("%s[DEBUG] Sorting symbols in reverse order%s\n", YELLOW, RESET);
-	}
-}
-
 static void print_symbols(t_file *file, unsigned char flags)
 {
-	// ft_putstr_fd(CYAN, 1);
-	// ft_printf("[DEBUG] Printing symbols for file: %s\n", file->filename);
 	t_symbol_node *current = file->symbols.head;
 
 	// TODO : implement sorting based on flags (default sort, reverse order, no sort)
 	// Default sort: by symbol name (ASCII order, trim '_', use ft_strcmp)
 	// Reverse order: same as default but in reverse
 	// No sort: print in the order they appear in the symbol table (already the case with linked list)
-	
-	sort_symbols(&file->symbols, flags);
 
 	while (current != NULL) {
 
@@ -306,6 +288,7 @@ void nm_process_files(t_nm *nm)
 		}
 
 		extract_symbols(&nm->files[i], nm->flags);
+		sort_symbols(&nm->files[i].symbols, nm->flags);
 		print_symbols(&nm->files[i], nm->flags);
 		nm_unmap_file(&nm->files[i]);
 		i++;

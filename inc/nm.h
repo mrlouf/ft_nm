@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   nm.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/13 16:12:54 by nponchon         ###   ########.fr       */
+/*   Updated: 2026/02/15 13:37:53 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ typedef struct s_nm
 
 void	nm_parse_args(int argc, char **argv, t_nm *nm);
 void	nm_process_files(t_nm *nm);
+void	sort_symbols(t_symbol_list *list, unsigned char flags);
 void	nm_print_symbols(t_nm *nm);
 int		check_elf_magic(Elf64_Ehdr *ehdr);
 void	nm_unmap_file(t_file *file);

@@ -6,7 +6,7 @@
 #    By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#              #
-#    Updated: 2026/02/12 13:02:21 by nicolas          ###   ########.fr        #
+#    Updated: 2026/02/15 13:36:08 by nicolas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,8 @@ LIBFT_DIR	= libft
 SRC			= main.c		\
 			parse.c			\
 			process.c		\
-			utils.c
+			utils.c			\
+			sort.c
 
 SRCDIR		= src
 SRCS		= $(addprefix $(SRCDIR)/, $(SRC))
