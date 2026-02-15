@@ -138,5 +138,35 @@ for file in "${files[@]}"; do
     fi
 done
 
-# echo ""
+echo ""
+rm -fr ./test_files/*
+
+################################
+#            All symbols       #
+################################
+
+echo "Testing all symbols (-a flag)..."
+echo ""
+
+files=("ft_nm"
+        ".obj/main.o"
+        ".obj/parse.o"
+        ".obj/sort.o"
+        ".obj/utils.o"
+        ".obj/process.o"
+        )
+
+for file in "${files[@]}"; do
+    ./ft_nm -a "$file" > ./test_files/test1;
+    nm -a "$file" > ./test_files/test2;
+    if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
+        echo "$RED Test failed for $file $RESET"
+        echo ""
+    else
+        echo "$GREEN Test passed for $file $RESET"
+        echo ""
+    fi
+done
+
+echo ""
 # rm -fr ./test_files/*

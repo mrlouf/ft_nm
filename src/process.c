@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/15 20:19:46 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/15 20:29:20 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ static void find_symtab(t_file *file)
 	ft_printf("[DEBUG] No symbol table found in file: %s%s\n", file->filename, RESET); */
 }
 
-static void add_symbol_to_file(t_file *file, t_symbol *symbol, unsigned char flags)
+static void add_symbol_to_file(t_file *file, t_symbol *symbol)
 {
 	t_symbol_node *new_node = malloc(sizeof(t_symbol_node));
 	if (!new_node)
@@ -146,17 +146,10 @@ static void add_symbol_to_file(t_file *file, t_symbol *symbol, unsigned char fla
 	else {
 		t_symbol_node *current = file->symbols.head;
 
-		if (flags & FLAG_R) {
-			// Reverse order: insert at the beginning
-			new_node->next = file->symbols.head;
-			file->symbols.head = new_node;
-		} else {
-			// Default order: insert at the end
-			while (current->next != NULL) {
-				current = current->next;
-			}
-			current->next = new_node;
+		while (current->next != NULL) {
+			current = current->next;
 		}
+		current->next = new_node;
 	}
 	file->symbols.count++;
 }
@@ -205,7 +198,7 @@ static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *
     return c;
 }
 
-static void extract_symbols(t_file *file, unsigned char flags)
+static void extract_symbols(t_file *file)
 {
 	// ft_putstr_fd(BLUE, 1);
 	// ft_printf("[DEBUG] Extracting symbols from file: %s\n", file->filename);
@@ -234,7 +227,7 @@ static void extract_symbols(t_file *file, unsigned char flags)
         symbol.size = sym->st_size;
         symbol.bind = ELF64_ST_BIND(sym->st_info);
         symbol.sym_type = ELF64_ST_TYPE(sym->st_info);
-		add_symbol_to_file(file, &symbol, flags);
+		add_symbol_to_file(file, &symbol);
 
 	}
 	// ft_putstr_fd(RESET, 1);
@@ -242,8 +235,10 @@ static void extract_symbols(t_file *file, unsigned char flags)
 
 static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 {
-	if (!(flags & FLAG_A) && (sym->type == 'a'))
+	if (!(flags & FLAG_A) && sym->type == 'a')
 		return 1; // Skip debugger-only symbols if -a is not set
+	if (flags & FLAG_A && sym->type == 'N')
+		return 0; // Skip symbols with no type if -a is set
 /* 	// Skip non-global symbols if -g is not set
 	if (!(flags & FLAG_G) && sym->bind != STB_GLOBAL)
 		return 1;
@@ -293,7 +288,7 @@ void nm_process_files(t_nm *nm)
 			continue;
 		}
 
-		extract_symbols(&nm->files[i], nm->flags);
+		extract_symbols(&nm->files[i]);
 		sort_symbols(&nm->files[i].symbols, nm->flags);
 		print_symbols(&nm->files[i], nm->flags);
 		nm_unmap_file(&nm->files[i]);
