@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/15 19:48:07 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/15 20:12:17 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,9 +86,16 @@ static int	extract_file_data(t_file *file)
 
 	file->size = st.st_size;
 
-	if (file->size == 0 || file->size < sizeof(Elf64_Ehdr))
+	if (file->size == 0)
 	{
 		close(fd);
+		return (1);
+	}
+
+	if (file->size < sizeof(Elf64_Ehdr))
+	{
+		close(fd);
+		nm_warning(file->filename, ": file format not recognized");
 		return (1);
 	}
 
@@ -251,11 +258,6 @@ static void print_symbols(t_file *file, unsigned char flags)
 {
 	t_symbol_node *current = file->symbols.head;
 
-	// TODO : implement sorting based on flags (default sort, reverse order, no sort)
-	// Default sort: by symbol name (ASCII order, trim '_', use ft_strcmp)
-	// Reverse order: same as default but in reverse
-	// No sort: print in the order they appear in the symbol table (already the case with linked list)
-
 	while (current != NULL) {
 
 		t_symbol *sym = &current->symbol;
@@ -265,7 +267,7 @@ static void print_symbols(t_file *file, unsigned char flags)
 			current = current->next;
 			continue;
 		}
-		if (sym->value != 0)
+		if (sym->value != 0 || sym->type == 'T' || sym->type == 't')
 		// TODO - replace printf call by a helper function allowed by the subject
 			printf("%016lx %c %s\n", sym->value, sym->type, sym->name);
 		else
@@ -273,8 +275,6 @@ static void print_symbols(t_file *file, unsigned char flags)
 		
 		current = current->next;
 	}
-		
-	// ft_putstr_fd(RESET, 1);
 }
 
 void nm_process_files(t_nm *nm)

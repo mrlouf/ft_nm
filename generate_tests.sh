@@ -6,6 +6,7 @@ YELLOW=$'\033[0;33m'
 RESET=$'\033[0m'
 
 mkdir -p test_files
+rm -fr ./test_files/*
 
 ################################
 #       Incorrect files        #
@@ -33,9 +34,9 @@ STATUS1=0
 STATUS2=0
 
 for file in test_files/*; do
-    ./ft_nm "$file" > test1;
+    ./ft_nm "$file" > ./test_files/test1;
     STATUS1=$?
-    nm "$file" > test2;
+    nm "$file" > ./test_files/test2;
     STATUS2=$?
     if [ $STATUS1 -ne $STATUS2 ]; then
         echo "$RED Test failed for $file $RESET"
@@ -57,12 +58,17 @@ echo "Testing regular files..."
 echo ""
 
 files=("ft_nm"
-        "./.obj/main.o")
+        ".obj/main.o"
+        ".obj/parse.o"
+        ".obj/sort.o"
+        ".obj/utils.o"
+        ".obj/process.o"
+        )
 
 for file in "${files[@]}"; do
-    ./ft_nm "$file" > test1;
-    nm "$file" > test2;
-    if ! diff -q test1 test2 > /dev/null; then
+    ./ft_nm "$file" > ./test_files/test1;
+    nm "$file" > ./test_files/test2;
+    if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
         echo ""
     else
@@ -70,3 +76,67 @@ for file in "${files[@]}"; do
         echo ""
     fi
 done
+
+echo ""
+rm -fr ./test_files/*
+
+
+################################
+#       Reverse sort           #
+################################
+
+echo "Testing reverse sort..."
+echo ""
+
+files=("ft_nm"
+        ".obj/main.o"
+        ".obj/parse.o"
+        ".obj/sort.o"
+        ".obj/utils.o"
+        ".obj/process.o"
+        )
+
+for file in "${files[@]}"; do
+    ./ft_nm -r "$file" > ./test_files/test1;
+    nm -r "$file" > ./test_files/test2;
+    if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
+        echo "$RED Test failed for $file $RESET"
+        echo ""
+    else
+        echo "$GREEN Test passed for $file $RESET"
+        echo ""
+    fi
+done
+
+echo ""
+rm -fr ./test_files/*
+
+################################
+#            No sort           #
+################################
+
+echo "Testing no sort..."
+echo ""
+
+files=("ft_nm"
+        ".obj/main.o"
+        ".obj/parse.o"
+        ".obj/sort.o"
+        ".obj/utils.o"
+        ".obj/process.o"
+        )
+
+for file in "${files[@]}"; do
+    ./ft_nm -p "$file" > ./test_files/test1;
+    nm -p "$file" > ./test_files/test2;
+    if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
+        echo "$RED Test failed for $file $RESET"
+        echo ""
+    else
+        echo "$GREEN Test passed for $file $RESET"
+        echo ""
+    fi
+done
+
+# echo ""
+# rm -fr ./test_files/*

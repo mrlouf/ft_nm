@@ -1,6 +1,0 @@
-                 U ft_memset
-0000000000000000 T main
-                 U nm_cleanup
-                 U nm_parse_args
-                 U nm_process_files
-                 U __stack_chk_fail

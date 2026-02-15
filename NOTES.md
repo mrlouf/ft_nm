@@ -6,6 +6,8 @@
 
 - The `.symtab` section is the regular symbol table, and is used as a sort of dictionnary to resolve symbol names to their types and values, using a "name <-> address" mapping. This is used by the linker to resolve symbol references between object files and libraries.
 
+- By default, the `t` and `T` symbols are printed out even though they have a value of 0.
+
 ## Bonus
 
 The following flags are supported:
