@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/15 20:12:17 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/15 20:19:46 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,7 +284,6 @@ void nm_process_files(t_nm *nm)
 	i = 0;
 	while (nm->files[i].filename != NULL)
 	{
-		// ft_printf("%s[DEBUG] Processing file: %s%s\n", GREEN, nm->files[i].filename, RESET);
 		if (extract_file_data(&nm->files[i]) != 0 || parse_elf_headers(&nm->files[i]) != 0)
 		{
 			if (nm->files[i].data != NULL)
