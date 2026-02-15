@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strtrim.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nponchon <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/18 15:43:41 by nponchon          #+#    #+#             */
-/*   Updated: 2024/09/24 18:19:36 by nponchon         ###   ########.fr       */
+/*   Updated: 2026/02/15 15:34:10 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@
  *	to trim
  *	- Use ft_strchr again from the end and decrementing so as to skip
  *	trail-characters to be trimmed
- *	- Use ft_substr to create the substring trimmed			*/
-
+ *	- Use ft_substr to create the substring trimmed
+ */
 char	*ft_strtrim(char const *s1, char const *set)
 {
 	size_t	end;
