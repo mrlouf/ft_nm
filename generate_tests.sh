@@ -85,7 +85,7 @@ rm -fr ./test_files/*
 #       Reverse sort           #
 ################################
 
-echo "Testing reverse sort..."
+echo "Testing reverse sort (-r flag)..."
 echo ""
 
 files=("ft_nm"
@@ -115,7 +115,7 @@ rm -fr ./test_files/*
 #            No sort           #
 ################################
 
-echo "Testing no sort..."
+echo "Testing no sort (-p flag)..."
 echo ""
 
 files=("ft_nm"
@@ -169,4 +169,64 @@ for file in "${files[@]}"; do
 done
 
 echo ""
-# rm -fr ./test_files/*
+rm -fr ./test_files/*
+
+################################
+#         Global symbols       #
+################################
+
+echo "Testing global symbols (-g flag)..."
+echo ""
+
+files=("ft_nm"
+        ".obj/main.o"
+        ".obj/parse.o"
+        ".obj/sort.o"
+        ".obj/utils.o"
+        ".obj/process.o"
+        )
+
+for file in "${files[@]}"; do
+    ./ft_nm -g "$file" > ./test_files/test1;
+    nm -g "$file" > ./test_files/test2;
+    if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
+        echo "$RED Test failed for $file $RESET"
+        echo ""
+    else
+        echo "$GREEN Test passed for $file $RESET"
+        echo ""
+    fi
+done
+
+echo ""
+rm -fr ./test_files/*
+
+################################
+#         Undeined symbols     #
+################################
+
+echo "Testing undefined symbols (-u flag)..."
+echo ""
+
+files=("ft_nm"
+        ".obj/main.o"
+        ".obj/parse.o"
+        ".obj/sort.o"
+        ".obj/utils.o"
+        ".obj/process.o"
+        )
+
+for file in "${files[@]}"; do
+    ./ft_nm -u "$file" > ./test_files/test1;
+    nm -u "$file" > ./test_files/test2;
+    if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
+        echo "$RED Test failed for $file $RESET"
+        echo ""
+    else
+        echo "$GREEN Test passed for $file $RESET"
+        echo ""
+    fi
+done
+
+echo ""
+rm -fr ./test_files/*

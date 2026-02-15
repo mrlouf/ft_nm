@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/15 20:29:20 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/15 20:45:51 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,6 +160,9 @@ static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *
     unsigned char type = ELF64_ST_TYPE(sym->st_info);
     Elf64_Half shndx = sym->st_shndx;
     char c;
+
+	// TODO: investigate how to extract -a symbols and how to print them (type 'a').
+	// We might have to extract them here.
     
     if (shndx == SHN_UNDEF && bind != STB_WEAK)
         return 'U';
@@ -203,6 +206,9 @@ static void extract_symbols(t_file *file)
 	// ft_putstr_fd(BLUE, 1);
 	// ft_printf("[DEBUG] Extracting symbols from file: %s\n", file->filename);
 
+	// TODO: handle flag -a to extract all symbols, including those with no name 
+	// and handle them differently during printing.
+
 	find_symtab(file);
 	if (file->symtab == NULL) {
 		ft_printf("ft_nm: %s: no symbol\n", file->filename);
@@ -223,6 +229,7 @@ static void extract_symbols(t_file *file)
 		t_symbol symbol;
         symbol.value = sym->st_value;
         symbol.name = name;  // Pointe directement dans le mapping
+		//printf("[DEBUG] Extracted symbol: %s with value: 0x%lx\n", symbol.name, symbol.value);
         symbol.type = get_symbol_type(sym, file->shdr, file->ehdr);
         symbol.size = sym->st_size;
         symbol.bind = ELF64_ST_BIND(sym->st_info);
@@ -237,8 +244,8 @@ static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 {
 	if (!(flags & FLAG_A) && sym->type == 'a')
 		return 1; // Skip debugger-only symbols if -a is not set
-	if (flags & FLAG_A && sym->type == 'N')
-		return 0; // Skip symbols with no type if -a is set
+/* 	if (flags & FLAG_A && sym->type == 'N')
+		return 0; // Skip symbols with no type if -a is set */
 /* 	// Skip non-global symbols if -g is not set
 	if (!(flags & FLAG_G) && sym->bind != STB_GLOBAL)
 		return 1;
