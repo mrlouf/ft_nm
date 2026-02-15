@@ -6,7 +6,7 @@
 #    By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#              #
-#    Updated: 2026/02/15 13:36:08 by nicolas          ###   ########.fr        #
+#    Updated: 2026/02/15 15:09:32 by nicolas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -75,7 +75,7 @@ clean:
 fclean: clean
 	@echo "$(YELLOW)Removing binaries...$(RESET)"
 	@$(MAKE) -C $(LIBFT_DIR) fclean
-	@/bin/rm -f $(NAME)
+	@/bin/rm -f $(NAME) $(DEPS) -r $(DEPDIR) $(OBJDIR)
 	@echo "$(GREEN)Full clean complete!$(RESET)"
 
 re: fclean all
