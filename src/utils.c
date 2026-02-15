@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/12 13:00:09 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/15 13:38:07 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/15 19:41:43 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,18 @@ void	nm_cleanup(t_nm *nm)
         i++;
     }
     free(nm->files);
+}
+
+void	nm_warning(const char *msg, const char *detail)
+{
+	ft_putstr_fd(YELLOW, 2);
+	ft_putstr_fd("ft_nm: ", 2);
+	if (msg)
+		ft_putstr_fd((char *)msg, 2);
+	if (detail)
+		ft_putstr_fd((char *)detail, 2);
+	ft_putendl_fd("", 2);
+	ft_putstr_fd(RESET, 1);
 }
 
 void	nm_error(const char *msg)

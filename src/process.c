@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/15 14:43:14 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/15 19:48:07 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,11 @@ static int	extract_file_data(t_file *file)
 	if (fd < 0)
 	{
 		if (errno == ENOENT)
-		{
-			ft_putstr_fd("ft_nm: ", 2);
-			ft_putstr_fd(file->filename, 2);
-			ft_putendl_fd(": No such file", 2);
-		}
+			nm_warning(file->filename, ": No such file or directory");
+		else if (errno == EACCES)
+			nm_warning(file->filename, ": Permission denied");
+		else
+			nm_warning(file->filename, ": Unable to open file");
 		return (1);
 	}
 
@@ -80,11 +80,18 @@ static int	extract_file_data(t_file *file)
 	if (!S_ISREG(st.st_mode))	// Skip non regular files (directories, device files)
 	{
 		close(fd);
-		// ft_printf("%s[DEBUG] %s: Not a regular file%s\n", YELLOW, file->filename, RESET);
+		nm_warning(file->filename, " is a folder");
 		return (1);
 	}
 
 	file->size = st.st_size;
+
+	if (file->size == 0 || file->size < sizeof(Elf64_Ehdr))
+	{
+		close(fd);
+		return (1);
+	}
+
 	file->data = mmap(NULL, file->size, PROT_READ, MAP_PRIVATE, fd, 0);
 	close(fd);
 	

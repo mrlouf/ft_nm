@@ -6,7 +6,7 @@
 #    By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#              #
-#    Updated: 2026/02/15 15:09:32 by nicolas          ###   ########.fr        #
+#    Updated: 2026/02/15 19:22:00 by nicolas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,6 +40,7 @@ INCLUDES	= -I$(INC_DIR) -I$(LIBFT_DIR)
 LDFLAGS		= -L$(LIBFT_DIR) -lft
 DFLAGS		= -MT $@ -MMD -MP
 
+RED			= \033[0;31m
 GREEN		= \033[0;32m
 YELLOW		= \033[0;33m
 RESET		= \033[0m
@@ -77,6 +78,12 @@ fclean: clean
 	@$(MAKE) -C $(LIBFT_DIR) fclean
 	@/bin/rm -f $(NAME) $(DEPS) -r $(DEPDIR) $(OBJDIR)
 	@echo "$(GREEN)Full clean complete!$(RESET)"
+
+test: all
+	@echo ""
+	@echo "$(YELLOW)Running tests...$(RESET)"
+	@echo ""
+	@./generate_tests.sh
 
 re: fclean all
 

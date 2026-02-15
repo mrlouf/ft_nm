@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/13 17:27:31 by nponchon         ###   ########.fr       */
+/*   Updated: 2026/02/15 19:05:39 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static void	print_usage(void)
 	ft_putstr_fd("Options:\n", 2);
 	ft_putstr_fd("  -a, --all           	Display all symbols, even debugger-only symbols\n", 2);
 	ft_putstr_fd("  -g, --extern-only  	Only external symbols\n", 2);
-	ft_putstr_fd("  -u, --undefined-only	Sort by address\n", 2);
+	ft_putstr_fd("  -u, --undefined-only	Only undefined symbols\n", 2);
 	ft_putstr_fd("  -r, --reverse       	Sort in reverse order\n", 2);
 	ft_putstr_fd("  -p, --no-sort       	Do not sort\n", 2);
 	exit(1);

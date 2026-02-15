@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/15 13:37:53 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/15 19:40:32 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,8 +102,11 @@ void	nm_process_files(t_nm *nm);
 void	sort_symbols(t_symbol_list *list, unsigned char flags);
 void	nm_print_symbols(t_nm *nm);
 int		check_elf_magic(Elf64_Ehdr *ehdr);
-void	nm_unmap_file(t_file *file);
+
 void	nm_error(const char *msg);
+void	nm_warning(const char *msg, const char *detail);
+
+void	nm_unmap_file(t_file *file);
 void	nm_cleanup(t_nm *nm);
 
 // Symbol list management
