@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/16 17:32:39 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 17:38:19 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@ static void	print_usage(void)
 {
 	ft_putstr_fd("Usage: ft_nm [options] <file>...\n", 2);
 	ft_putstr_fd("Options:\n", 2);
-	ft_putstr_fd("  -a, --all           	Display all symbols, even debugger-only symbols\n", 2);
+	ft_putstr_fd("  -a, --debug-syms	Display all symbols, even debugger-only symbols\n", 2);
 	ft_putstr_fd("  -g, --extern-only  	Only external symbols\n", 2);
 	ft_putstr_fd("  -u, --undefined-only	Only undefined symbols\n", 2);
-	ft_putstr_fd("  -r, --reverse-sort     	Sort in reverse order\n", 2);
+	ft_putstr_fd("  -r, --reverse-sort    Sort in reverse order\n", 2);
 	ft_putstr_fd("  -p, --no-sort       	Do not sort\n", 2);
 	exit(1);
 }
@@ -68,6 +68,9 @@ static void parse_short_flags(unsigned char *flags, char flag_char)
 
 static void parse_long_flags(unsigned char *flags, char *flag_str)
 {
+	if (ft_strcmp(flag_str, "") == 0)
+		invalid_option_error(0, flag_str);
+
 	if (ft_strcmp(flag_str, "debug-syms") == 0) {
 		*flags |= FLAG_A;
 		*flags &= ~FLAG_G;

@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 13:35:53 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/16 15:08:53 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 17:50:07 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,22 @@ static int compare_symbols_reverse(const void *a, const void *b)
 
 static void sort_symbols_in_array(t_symbol_node ***array, size_t count, unsigned char flags)
 {
-    qsort(*array, count, sizeof(t_symbol_node *), (flags & FLAG_R) ? compare_symbols_reverse : compare_symbols);
+    int (*cmp)(const void *, const void *);
+    
+    cmp = (flags & FLAG_R) ? compare_symbols_reverse : compare_symbols;
+
+    for (size_t i = 0; i < count; i++)
+    {
+        for (size_t j = i + 1; j < count; j++)
+        {
+            if (cmp(&(*array)[i], &(*array)[j]) > 0)
+            {
+                t_symbol_node *tmp = (*array)[i];
+                (*array)[i] = (*array)[j];
+                (*array)[j] = tmp;
+            }
+        }
+    }
 }
 
 void sort_symbols(t_symbol_list *list, unsigned char flags)

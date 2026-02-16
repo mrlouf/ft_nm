@@ -3,6 +3,7 @@ ft_nm
 
 # Test folder
 test_files/
+test*
 
 # Hidden folders
 .dep
