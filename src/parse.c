@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/16 14:16:51 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 14:47:44 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,26 +40,26 @@ static void invalid_option_error(char flag_char, char *flag_str)
 static void parse_individual_flags(unsigned char *flags, char flag_char)
 {
 	if (flag_char == 'a') {
-		*flags |= FLAG_A; // Display all symbols, even debugger-only symbols
+		*flags |= FLAG_A;
 		*flags &= ~FLAG_G;
 		*flags &= ~FLAG_U;
 	}
 	else if (flag_char == 'g') {
-		*flags |= FLAG_G; // Only external symbols
+		*flags |= FLAG_G;
 		*flags &= ~FLAG_A;
 		*flags &= ~FLAG_U;
 	}
 	else if (flag_char == 'u') {
-		*flags |= FLAG_U; // Undefined symbols only
+		*flags |= FLAG_U;
 		*flags &= ~FLAG_A;
 		*flags &= ~FLAG_G;
 	}
 	else if (flag_char == 'r') {
-		*flags |= FLAG_R; // Sort in reverse order
+		*flags |= FLAG_R;
 		*flags &= ~FLAG_P;
 	}
 	else if (flag_char == 'p') {
-		*flags |= FLAG_P; // Do not sort, keep table order
+		*flags |= FLAG_P;
 		*flags &= ~FLAG_R;
 	}
 	else
@@ -68,27 +68,27 @@ static void parse_individual_flags(unsigned char *flags, char flag_char)
 
 static void parse_full_flags(unsigned char *flags, char *flag_str)
 {
-	if (ft_strcmp(flag_str, "all") == 0) {
-		*flags |= FLAG_A; // Display all symbols, even debugger-only symbols
+	if (ft_strcmp(flag_str, "debug-syms") == 0) {
+		*flags |= FLAG_A;
 		*flags &= ~FLAG_G;
 		*flags &= ~FLAG_U;
 	}
 	else if (ft_strcmp(flag_str, "extern-only") == 0) {
-		*flags |= FLAG_G; // Only external symbols
+		*flags |= FLAG_G;
 		*flags &= ~FLAG_A;
 		*flags &= ~FLAG_U;
 	}
 	else if (ft_strcmp(flag_str, "undefined-only") == 0) {
-		*flags |= FLAG_U; // Undefined symbols only
+		*flags |= FLAG_U;
 		*flags &= ~FLAG_A;
 		*flags &= ~FLAG_G;
 	}
-	else if (ft_strcmp(flag_str, "reverse") == 0) {
-		*flags |= FLAG_R; // Sort in reverse order
+	else if (ft_strcmp(flag_str, "reverse-sort") == 0) {
+		*flags |= FLAG_R;
 		*flags &= ~FLAG_P;
 	}
 	else if (ft_strcmp(flag_str, "no-sort") == 0) {
-		*flags |= FLAG_P; // Do not sort, keep table order
+		*flags |= FLAG_P;
 		*flags &= ~FLAG_R;
 	}
 	else

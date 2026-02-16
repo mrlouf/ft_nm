@@ -12,3 +12,5 @@ Fichier corrompu?
 
 - Investigate whether flag -a needs to print the value or not, and if nameless symbols should be printed as well.
 - flag a: need to extract all symbols greedily
+
+- use ft_printf or write instead of printf, as required by the subject

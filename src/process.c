@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/16 13:25:40 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 16:56:12 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,9 +160,6 @@ static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *
     unsigned char type = ELF64_ST_TYPE(sym->st_info);
     Elf64_Half shndx = sym->st_shndx;
     char c;
-
-	// TODO: investigate how to extract -a symbols and how to print them (type 'a').
-	// We might have to extract them here.
     
     if (shndx == SHN_UNDEF && bind != STB_WEAK)
         return 'U';
@@ -195,7 +192,7 @@ static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *
             c = 'W';
     }
     
-    if (bind == STB_LOCAL && c != 'U' && c != 'w')
+    if (bind == STB_LOCAL && c != 'U' && c != 'w' && c != 'N')
         c = ft_tolower(c);
     
     return c;
@@ -203,44 +200,54 @@ static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *
 
 static void extract_symbols(t_file *file, unsigned char flags)
 {
-	// TODO: handle flag -a to extract all symbols, including those with no name 
-	// and handle them differently during printing.
-
-	find_symtab(file);
-	if (file->symtab == NULL) {
-		ft_printf("ft_nm: %s: no symbol\n", file->filename);
-		return ;
-	}
-	
-	for (int i = 0; i < file->symtab_size; i++)
-	{
-		Elf64_Sym *sym = &file->symtab[i];
-		
-        if (sym->st_name == 0 && !(flags & FLAG_A)) // Skip symbols with no name if -a is not set
-            continue;
+    find_symtab(file);
+    if (file->symtab == NULL) {
+        ft_printf("ft_nm: %s: no symbol\n", file->filename);
+        return;
+    }
+    
+    
+    for (int i = 0; i < file->symtab_size; i++)
+    {
+        Elf64_Sym *sym = &file->symtab[i];
+        char *name;
         
-        char *name = file->strtab + sym->st_name;
-        if (name[0] == '\0' && !(flags & FLAG_A)) // Skip symbols with empty name if -a is not set
-            continue;
+/*         // Pour les symboles de type SECTION, récupérer le nom depuis shstrtab
+        if (ELF64_ST_TYPE(sym->st_info) == STT_SECTION || ELF64_ST_TYPE(sym->st_info) == STT_FILE) {
+            if (sym->st_shndx < file->ehdr->e_shnum) {
+                Elf64_Shdr *section = &file->shdr[sym->st_shndx];
+                name = file->strtab + section->sh_name;
+            } else {
+                name = "";
+            }
+        } else {
+            // Cas normal : nom dans strtab
+            name = file->strtab + sym->st_name;
+        } */
 
-		t_symbol symbol;
+		name = file->strtab + sym->st_name;
+        
+        if (name[0] == '\0' && !(flags & FLAG_A))
+            continue;
+            
+        t_symbol symbol;
         symbol.value = sym->st_value;
         symbol.name = name;
-		//printf("[DEBUG] Extracted symbol: %s with value: 0x%lx\n", symbol.name, symbol.value);
         symbol.type = get_symbol_type(sym, file->shdr, file->ehdr);
         symbol.size = sym->st_size;
         symbol.bind = ELF64_ST_BIND(sym->st_info);
         symbol.sym_type = ELF64_ST_TYPE(sym->st_info);
-		add_symbol_to_file(file, &symbol);
-
-	}
+        add_symbol_to_file(file, &symbol);
+    }
 }
 
 static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 {
+/* 	if (sym->type == 't')
+		return 0; */
 	if (sym->type == 'U' && sym->name[0] == '\0')
 		return 1; // Skip symbols with null name
-	if (!(flags & FLAG_A) && sym->type == 'a')
+	if (!(flags & FLAG_A) && (sym->type == 'a' || sym->type == 'N'))
 		return 1; // Skip debugger-only symbols if -a is not set
 	if (flags & FLAG_U && sym->type != 'U' && sym->type != 'w')
 		return 1; // Only allow undefined symbols if -u is set
@@ -261,7 +268,6 @@ static void print_symbols(t_file *file, unsigned char flags)
 		if (!symbol_should_be_skipped(sym, flags))
 		{
 			if (sym->value != 0 || sym->type == 'T' || sym->type == 't')
-			// TODO - replace printf call by a helper function allowed by the subject
 				printf("%016lx %c %s\n", sym->value, sym->type, sym->name);
 			else if (sym->type == 'a')
 				printf("%016x %c %s\n", 0, sym->type, sym->name);

@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 13:35:53 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/15 20:20:19 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 15:08:53 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ static int compare_symbols(const void *a, const void *b)
         nm_error("memory allocation failed");
 
     int result = ft_strcasecmp(name_a, name_b);
+    if (result == 0)
+        result = ft_strcmp(sym_a->symbol.name, sym_b->symbol.name);
 
     free(name_a);
     free(name_b);
