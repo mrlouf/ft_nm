@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/16 11:12:27 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 13:25:40 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,11 +201,8 @@ static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *
     return c;
 }
 
-static void extract_symbols(t_file *file)
+static void extract_symbols(t_file *file, unsigned char flags)
 {
-	// ft_putstr_fd(BLUE, 1);
-	// ft_printf("[DEBUG] Extracting symbols from file: %s\n", file->filename);
-
 	// TODO: handle flag -a to extract all symbols, including those with no name 
 	// and handle them differently during printing.
 
@@ -219,16 +216,16 @@ static void extract_symbols(t_file *file)
 	{
 		Elf64_Sym *sym = &file->symtab[i];
 		
-        if (sym->st_name == 0)
+        if (sym->st_name == 0 && !(flags & FLAG_A)) // Skip symbols with no name if -a is not set
             continue;
         
         char *name = file->strtab + sym->st_name;
-        if (name[0] == '\0')
+        if (name[0] == '\0' && !(flags & FLAG_A)) // Skip symbols with empty name if -a is not set
             continue;
 
 		t_symbol symbol;
         symbol.value = sym->st_value;
-        symbol.name = name;  // Pointe directement dans le mapping
+        symbol.name = name;
 		//printf("[DEBUG] Extracted symbol: %s with value: 0x%lx\n", symbol.name, symbol.value);
         symbol.type = get_symbol_type(sym, file->shdr, file->ehdr);
         symbol.size = sym->st_size;
@@ -237,21 +234,18 @@ static void extract_symbols(t_file *file)
 		add_symbol_to_file(file, &symbol);
 
 	}
-	// ft_putstr_fd(RESET, 1);
 }
 
 static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 {
+	if (sym->type == 'U' && sym->name[0] == '\0')
+		return 1; // Skip symbols with null name
 	if (!(flags & FLAG_A) && sym->type == 'a')
 		return 1; // Skip debugger-only symbols if -a is not set
 	if (flags & FLAG_U && sym->type != 'U' && sym->type != 'w')
 		return 1; // Only allow undefined symbols if -u is set
-/* 	// Skip non-global symbols if -g is not set
-	if (!(flags & FLAG_G) && sym->bind != STB_GLOBAL)
+ 	if (flags & FLAG_G && !(sym->bind == STB_GLOBAL || sym->bind == STB_WEAK))
 		return 1;
-	// Skip undefined symbols if -u is not set
-	if (!(flags & FLAG_U) && sym->type == 'U')
-		return 1; */
 	
 	return 0;
 }
@@ -264,17 +258,16 @@ static void print_symbols(t_file *file, unsigned char flags)
 
 		t_symbol *sym = &current->symbol;
 
-		if (symbol_should_be_skipped(sym, flags))
+		if (!symbol_should_be_skipped(sym, flags))
 		{
-			current = current->next;
-			continue;
+			if (sym->value != 0 || sym->type == 'T' || sym->type == 't')
+			// TODO - replace printf call by a helper function allowed by the subject
+				printf("%016lx %c %s\n", sym->value, sym->type, sym->name);
+			else if (sym->type == 'a')
+				printf("%016x %c %s\n", 0, sym->type, sym->name);
+			else
+				printf("%16s %c %s\n", "", sym->type, sym->name);
 		}
-		if (sym->value != 0 || sym->type == 'T' || sym->type == 't')
-		// TODO - replace printf call by a helper function allowed by the subject
-			printf("%016lx %c %s\n", sym->value, sym->type, sym->name);
-		else
-			printf("%16s %c %s\n", "", sym->type, sym->name);
-		
 		current = current->next;
 	}
 }
@@ -295,7 +288,7 @@ void nm_process_files(t_nm *nm)
 			continue;
 		}
 
-		extract_symbols(&nm->files[i]);
+		extract_symbols(&nm->files[i], nm->flags);
 		sort_symbols(&nm->files[i].symbols, nm->flags);
 		print_symbols(&nm->files[i], nm->flags);
 		nm_unmap_file(&nm->files[i]);
