@@ -202,7 +202,7 @@ echo ""
 rm -fr ./test_files/*
 
 ################################
-#         Undeined symbols     #
+#        Undefined symbols     #
 ################################
 
 echo "Testing undefined symbols (-u flag)..."

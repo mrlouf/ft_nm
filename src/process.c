@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/15 20:45:51 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 11:12:27 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,8 +244,8 @@ static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 {
 	if (!(flags & FLAG_A) && sym->type == 'a')
 		return 1; // Skip debugger-only symbols if -a is not set
-/* 	if (flags & FLAG_A && sym->type == 'N')
-		return 0; // Skip symbols with no type if -a is set */
+	if (flags & FLAG_U && sym->type != 'U' && sym->type != 'w')
+		return 1; // Only allow undefined symbols if -u is set
 /* 	// Skip non-global symbols if -g is not set
 	if (!(flags & FLAG_G) && sym->bind != STB_GLOBAL)
 		return 1;
