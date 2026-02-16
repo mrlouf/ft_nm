@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/16 16:56:12 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 17:31:57 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,8 +205,7 @@ static void extract_symbols(t_file *file, unsigned char flags)
         ft_printf("ft_nm: %s: no symbol\n", file->filename);
         return;
     }
-    
-    
+
     for (int i = 0; i < file->symtab_size; i++)
     {
         Elf64_Sym *sym = &file->symtab[i];
@@ -251,7 +250,7 @@ static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 		return 1; // Skip debugger-only symbols if -a is not set
 	if (flags & FLAG_U && sym->type != 'U' && sym->type != 'w')
 		return 1; // Only allow undefined symbols if -u is set
- 	if (flags & FLAG_G && !(sym->bind == STB_GLOBAL || sym->bind == STB_WEAK))
+	if (flags & FLAG_G && !(sym->bind == STB_GLOBAL || sym->bind == STB_WEAK))
 		return 1;
 	
 	return 0;

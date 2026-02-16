@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/16 14:47:44 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 17:32:39 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static void	print_usage(void)
 	ft_putstr_fd("  -a, --all           	Display all symbols, even debugger-only symbols\n", 2);
 	ft_putstr_fd("  -g, --extern-only  	Only external symbols\n", 2);
 	ft_putstr_fd("  -u, --undefined-only	Only undefined symbols\n", 2);
-	ft_putstr_fd("  -r, --reverse       	Sort in reverse order\n", 2);
+	ft_putstr_fd("  -r, --reverse-sort     	Sort in reverse order\n", 2);
 	ft_putstr_fd("  -p, --no-sort       	Do not sort\n", 2);
 	exit(1);
 }
@@ -37,7 +37,7 @@ static void invalid_option_error(char flag_char, char *flag_str)
 	print_usage();
 }
 
-static void parse_individual_flags(unsigned char *flags, char flag_char)
+static void parse_short_flags(unsigned char *flags, char flag_char)
 {
 	if (flag_char == 'a') {
 		*flags |= FLAG_A;
@@ -66,7 +66,7 @@ static void parse_individual_flags(unsigned char *flags, char flag_char)
 		invalid_option_error(flag_char, 0);
 }
 
-static void parse_full_flags(unsigned char *flags, char *flag_str)
+static void parse_long_flags(unsigned char *flags, char *flag_str)
 {
 	if (ft_strcmp(flag_str, "debug-syms") == 0) {
 		*flags |= FLAG_A;
@@ -109,14 +109,14 @@ static void	parse_flags(int argc, char **argv, t_nm *nm)
 			continue;
 		}
 		if (argv[i][0] == '-' && argv[i][1] == '-') {
-			parse_full_flags(&nm->flags, argv[i] + 2);
+			parse_long_flags(&nm->flags, argv[i] + 2);
 			total_flags++;
 			i++;
 			continue;
 		}
 		while (argv[i][j] != '\0')
 		{
-			parse_individual_flags(&nm->flags, argv[i][j]);
+			parse_short_flags(&nm->flags, argv[i][j]);
 			j++;
 		}
 		total_flags++;
