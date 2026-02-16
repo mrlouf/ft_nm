@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/15 19:05:39 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 14:16:51 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,77 @@ static void	print_usage(void)
 	exit(1);
 }
 
+static void invalid_option_error(char flag_char, char *flag_str)
+{
+	ft_putstr_fd(RED, 2);
+	ft_putstr_fd("ft_nm: invalid option -- '", 2);
+	if (flag_char)
+		ft_putchar_fd(flag_char, 2);
+	else if (flag_str)
+		ft_putstr_fd(flag_str, 2);
+	ft_putendl_fd("'", 2);
+	ft_putstr_fd(RESET, 1);
+	print_usage();
+}
+
+static void parse_individual_flags(unsigned char *flags, char flag_char)
+{
+	if (flag_char == 'a') {
+		*flags |= FLAG_A; // Display all symbols, even debugger-only symbols
+		*flags &= ~FLAG_G;
+		*flags &= ~FLAG_U;
+	}
+	else if (flag_char == 'g') {
+		*flags |= FLAG_G; // Only external symbols
+		*flags &= ~FLAG_A;
+		*flags &= ~FLAG_U;
+	}
+	else if (flag_char == 'u') {
+		*flags |= FLAG_U; // Undefined symbols only
+		*flags &= ~FLAG_A;
+		*flags &= ~FLAG_G;
+	}
+	else if (flag_char == 'r') {
+		*flags |= FLAG_R; // Sort in reverse order
+		*flags &= ~FLAG_P;
+	}
+	else if (flag_char == 'p') {
+		*flags |= FLAG_P; // Do not sort, keep table order
+		*flags &= ~FLAG_R;
+	}
+	else
+		invalid_option_error(flag_char, 0);
+}
+
+static void parse_full_flags(unsigned char *flags, char *flag_str)
+{
+	if (ft_strcmp(flag_str, "all") == 0) {
+		*flags |= FLAG_A; // Display all symbols, even debugger-only symbols
+		*flags &= ~FLAG_G;
+		*flags &= ~FLAG_U;
+	}
+	else if (ft_strcmp(flag_str, "extern-only") == 0) {
+		*flags |= FLAG_G; // Only external symbols
+		*flags &= ~FLAG_A;
+		*flags &= ~FLAG_U;
+	}
+	else if (ft_strcmp(flag_str, "undefined-only") == 0) {
+		*flags |= FLAG_U; // Undefined symbols only
+		*flags &= ~FLAG_A;
+		*flags &= ~FLAG_G;
+	}
+	else if (ft_strcmp(flag_str, "reverse") == 0) {
+		*flags |= FLAG_R; // Sort in reverse order
+		*flags &= ~FLAG_P;
+	}
+	else if (ft_strcmp(flag_str, "no-sort") == 0) {
+		*flags |= FLAG_P; // Do not sort, keep table order
+		*flags &= ~FLAG_R;
+	}
+	else
+		invalid_option_error(0, flag_str);
+}
+
 static void	parse_flags(int argc, char **argv, t_nm *nm)
 {
 	int	i, j, total_flags;
@@ -37,40 +108,15 @@ static void	parse_flags(int argc, char **argv, t_nm *nm)
 			i++;
 			continue;
 		}
+		if (argv[i][0] == '-' && argv[i][1] == '-') {
+			parse_full_flags(&nm->flags, argv[i] + 2);
+			total_flags++;
+			i++;
+			continue;
+		}
 		while (argv[i][j] != '\0')
 		{
-			if (argv[i][j] == 'a') {
-				nm->flags |= FLAG_A; // Display all symbols, even debugger-only symbols
-				nm->flags &= ~FLAG_G; // Disable extern only if display all is set
-				nm->flags &= ~FLAG_U; // Disable undefined only if display all is set
-			}
-			else if (argv[i][j] == 'g') {
-				nm->flags |= FLAG_G; // Only external symbols
-				nm->flags &= ~FLAG_A; // Disable display all if extern only is set
-				nm->flags &= ~FLAG_U; // Disable undefined only if extern only is set
-			}
-			else if (argv[i][j] == 'u') {
-				nm->flags |= FLAG_U; // Undefined symbols only
-				nm->flags &= ~FLAG_A; // Disable display all if undefined only is set
-				nm->flags &= ~FLAG_G; // Disable extern only if undefined only is set
-			}
-			else if (argv[i][j] == 'r') {
-				nm->flags |= FLAG_R; // Sort in reverse order
-				nm->flags &= ~FLAG_P; // Disable no sort if reverse is set
-			}
-			else if (argv[i][j] == 'p') {
-				nm->flags |= FLAG_P; // Do not sort: display in symbol table order
-				nm->flags &= ~FLAG_R; // Disable reverse sort if no sort is set
-			}
-			else
-			{
-				ft_putstr_fd(RED, 2);
-				ft_putstr_fd("ft_nm: invalid option -- '", 2);
-				ft_putchar_fd(argv[i][j], 2);
-				ft_putendl_fd("'", 2);
-				ft_putstr_fd(RESET, 2);
-				print_usage();
-			}
+			parse_individual_flags(&nm->flags, argv[i][j]);
 			j++;
 		}
 		total_flags++;
