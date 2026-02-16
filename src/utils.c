@@ -51,7 +51,7 @@ void	nm_warning(const char *msg, const char *detail)
 	if (detail)
 		ft_putstr_fd((char *)detail, 2);
 	ft_putendl_fd("", 2);
-	ft_putstr_fd(RESET, 1);
+	ft_putstr_fd(RESET, 2);
 }
 
 void	nm_error(const char *msg)
