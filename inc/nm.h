@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/15 19:40:32 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 19:18:24 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ typedef struct s_file
 	Elf64_Ehdr		*ehdr;
 	Elf64_Shdr		*shdr;
 	Elf64_Sym		*symtab;
+	
 	char			*strtab;
 	int				symtab_size;
 	t_symbol_list	symbols;

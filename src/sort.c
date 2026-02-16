@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 13:35:53 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/16 17:50:07 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 18:21:32 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ static void sort_symbols_in_array(t_symbol_node ***array, size_t count, unsigned
     int (*cmp)(const void *, const void *);
     
     cmp = (flags & FLAG_R) ? compare_symbols_reverse : compare_symbols;
-
+    
     for (size_t i = 0; i < count; i++)
     {
         for (size_t j = i + 1; j < count; j++)

@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/16 17:31:57 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 19:18:51 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,17 @@ static int	parse_elf_headers(t_file *file)
 /* 	ft_putstr_fd(BLUE, 1);
 	ft_printf("[DEBUG] Parsing mapping of file: %s\n", file->filename);
 	ft_printf("[DEBUG] Mapped at %p\n", file->data); */
+/* 
+	unsigned char *e_ident = (unsigned char *)file->data;
+
+	// Vérifier le type
+	if (e_ident[EI_CLASS] == ELFCLASS32) {
+		Elf32_Ehdr *ehdr32 = (Elf32_Ehdr *)data;
+		// Traiter comme 32 bits
+	} else if (e_ident[EI_CLASS] == ELFCLASS64) {
+		Elf64_Ehdr *ehdr64 = (Elf64_Ehdr *)data;
+		// Traiter comme 64 bits
+	} */
 
 	file->ehdr = (Elf64_Ehdr *)file->data;
 
@@ -256,6 +267,28 @@ static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 	return 0;
 }
 
+static void print_values(t_file *file, t_symbol *sym)
+{
+	char *padding = NULL;
+	(void)file;
+	(void)padding;
+	
+	if (sym->value != 0 || sym->type == 'T' || sym->type == 't') {
+		
+ 		printf("%016lx", sym->value);
+		fflush(stdout);
+
+	}
+	else if (sym->type == 'a') {
+		ft_printf("%s", "0000000000000000");
+	}
+	else {
+		ft_printf("%s", "                ");
+	}
+
+		ft_printf(" %c %s\n", sym->type, sym->name);
+}
+
 static void print_symbols(t_file *file, unsigned char flags)
 {
 	t_symbol_node *current = file->symbols.head;
@@ -266,12 +299,7 @@ static void print_symbols(t_file *file, unsigned char flags)
 
 		if (!symbol_should_be_skipped(sym, flags))
 		{
-			if (sym->value != 0 || sym->type == 'T' || sym->type == 't')
-				printf("%016lx %c %s\n", sym->value, sym->type, sym->name);
-			else if (sym->type == 'a')
-				printf("%016x %c %s\n", 0, sym->type, sym->name);
-			else
-				printf("%16s %c %s\n", "", sym->type, sym->name);
+			print_values(file, sym);
 		}
 		current = current->next;
 	}
