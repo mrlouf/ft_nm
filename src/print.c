@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 13:14:12 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 16:33:28 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 17:48:25 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,34 @@ static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 	return 0;
 }
 
+static void print_address(t_file *file, t_symbol *sym)
+{
+    char value[17] = { 0 };
+
+    int i = 0;
+    int tmp_value = sym->value;
+    while (i < 16 && sym->value != 0) {
+        value[15 - i] = "0123456789abcdef"[tmp_value % 16];
+        tmp_value /= 16;
+        i++;
+    }
+    
+    int padding_length = 0;
+    padding_length = (file->elf_class == ELFCLASS32) ? 8 - i : 16 - i;
+    
+    for (int j = 0; j < padding_length; j++) {
+        ft_putchar('0');
+    }
+    ft_putstr(value);
+
+}
+
 static void print_values(t_file *file, t_symbol *sym)
 {	
 	if (sym->value != 0 || sym->type == 'T' || sym->type == 't') {
-		
- 		if (file->elf_class == ELFCLASS32)
-			printf("%08lx", sym->value);
-		else if (file->elf_class == ELFCLASS64)
-			printf("%016lx", sym->value);
-		fflush(stdout);
-
+        
+ 		print_address(file, sym);
+        
 	}
 	else if (sym->type == 'a' || sym->type == 'N' || sym->type == 'r' ) {
 

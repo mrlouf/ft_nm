@@ -246,25 +246,26 @@ gcc -m32 ./test_files/test.c -o ./test_files/elf32 2>/dev/null
 
 if [ -f ./test_files/elf32 ]; then
     echo "$GREEN 32-bit ELF test file created successfully $RESET"
+    echo "Testing 32-bit ELF file..."
+    echo ""
+
+    ./ft_nm ./test_files/elf32 > ./test_files/test1;
+    nm ./test_files/elf32 > ./test_files/test2;
+
+    TOTAL_TESTS=$((TOTAL_TESTS + 1))
+
+    if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
+        echo "$RED Test failed for 32-bit ELF file $RESET"
+    else
+        echo "$GREEN Test passed for 32-bit ELF file $RESET"
+        PASSED_TESTS=$((PASSED_TESTS + 1))
+    fi
 else
     echo "$RED Failed to create 32-bit ELF test file, skipping test... $RESET"
     exit 1
 fi
 
-echo "Testing 32-bit ELF file..."
-echo ""
 
-./ft_nm ./test_files/elf32 > ./test_files/test1;
-nm ./test_files/elf32 > ./test_files/test2;
-
-TOTAL_TESTS=$((TOTAL_TESTS + 1))
-
-if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
-    echo "$RED Test failed for 32-bit ELF file $RESET"
-else
-    echo "$GREEN Test passed for 32-bit ELF file $RESET"
-    PASSED_TESTS=$((PASSED_TESTS + 1))
-fi
 
 echo ""
 
