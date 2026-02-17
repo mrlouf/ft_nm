@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/16 19:18:51 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 10:37:55 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ static int	extract_file_data(t_file *file)
 		return (1);
 	}
 
-	if (file->size < sizeof(Elf64_Ehdr))
+	if (file->size < sizeof(Elf64_Ehdr) && file->size < sizeof(Elf32_Ehdr))
 	{
 		close(fd);
 		nm_warning(file->filename, ": file format not recognized");

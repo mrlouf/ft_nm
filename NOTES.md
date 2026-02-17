@@ -8,6 +8,9 @@
 
 - By default, the `t` and `T` symbols are printed out even though they have a value of 0.
 
+- Obviously, the program should be able to handle both 32-bit and 64-bit ELF files, and possibly even little-endian and big-endian files. The program should be able to handle both executable files and shared libraries, as well as object files.
+This gives us two options: use void pointers and cast them to the appropriate types, or use a separate struct for each type of file (union?) and use a common struct to hold the common fields. The first option is more flexible, but the second option is more type-safe and easier to read.
+
 ## Bonus
 
 The following flags are supported:
