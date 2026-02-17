@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/17 13:17:37 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 13:28:39 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,10 @@
 # define RESET "\033[0m"
 
 # define DEFAULT_FILENAME "a.out"
+# define ZERO_PADDING_32 "00000000"
+# define ZERO_PADDING_64 "0000000000000000"
+# define SPACE_PADDING_32 "        "
+# define SPACE_PADDING_64 "                "
 
 # define FLAG_A 0x01 // Display all symbols, even debugger-only symbols
 # define FLAG_G 0x02 // Only external symbols

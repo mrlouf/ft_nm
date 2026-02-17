@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 13:14:12 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 13:15:28 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 13:27:34 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,21 +29,7 @@ static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 }
 
 static void print_values(t_file *file, t_symbol *sym)
-{
-	char *zero_padding = NULL;
-	char *space_padding = NULL;
-
-	if (file->elf_class == ELFCLASS32)
-	{
-		zero_padding = "00000000";
-		space_padding = "        ";
-	}
-	else if (file->elf_class == ELFCLASS64)
-	{
-		zero_padding = "0000000000000000";
-		space_padding = "                ";
-	}
-	
+{	
 	if (sym->value != 0 || sym->type == 'T' || sym->type == 't') {
 		
  		if (file->elf_class == ELFCLASS32)
@@ -54,13 +40,23 @@ static void print_values(t_file *file, t_symbol *sym)
 
 	}
 	else if (sym->type == 'a') {
-		ft_printf("%s", zero_padding);
+
+		if (file->elf_class == ELFCLASS32)
+			ft_printf("%s", ZERO_PADDING_32);
+		else if (file->elf_class == ELFCLASS64)
+			ft_printf("%s", ZERO_PADDING_64);
+        
 	}
 	else {
-		ft_printf("%s", space_padding);
+
+		if (file->elf_class == ELFCLASS32)
+			ft_printf("%s", SPACE_PADDING_32);
+		else if (file->elf_class == ELFCLASS64)
+			ft_printf("%s", SPACE_PADDING_64);
+
 	}
 
-		ft_printf(" %c %s\n", sym->type, sym->name);
+	ft_printf(" %c %s\n", sym->type, sym->name);
 }
 
 void nm_print_symbols(t_file *file, unsigned char flags)
