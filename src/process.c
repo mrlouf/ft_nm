@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 12:11:10 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 12:30:42 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,10 +136,7 @@ static void find_symtab(t_file *file)
 		int i = 0;
 		while (i < file->u.file32.ehdr->e_shnum)
 		{
-			// const char *section_name = file->strtab + file->shdr[i].sh_name;
-			//ft_printf("[DEBUG] Section %d: %s\n", i, section_name);
 			if (file->u.file32.shdr[i].sh_type == SHT_SYMTAB) { 
-				// ft_printf("%s[DEBUG] Found symbol table in section: %s%s\n", GREEN, section_name, RESET);
 				file->u.file32.symtab = (Elf32_Sym *)(file->data + file->u.file32.shdr[i].sh_offset);
 				file->u.file32.symtab_size = file->u.file32.shdr[i].sh_size / sizeof(Elf32_Sym);
 				file->u.file32.strtab = (char *)(file->data + file->u.file32.shdr[file->u.file32.shdr[i].sh_link].sh_offset);
@@ -148,6 +145,12 @@ static void find_symtab(t_file *file)
 			i++;
 		}
 	
+	if (file->u.file64.ehdr->e_shoff > file->size
+		|| file->u.file64.ehdr->e_shoff + (file->u.file64.ehdr->e_shnum * sizeof(Elf64_Shdr)) > file->size)
+		return;
+	if (file->u.file64.ehdr->e_shstrndx >= file->u.file64.ehdr->e_shnum)
+		return;
+
 	} else if (file->elf_class == ELFCLASS64) {
 
 		file->u.file64.shdr = (Elf64_Shdr *)(file->data + file->u.file64.ehdr->e_shoff);
@@ -156,10 +159,7 @@ static void find_symtab(t_file *file)
 		int i = 0;
 		while (i < file->u.file64.ehdr->e_shnum)
 		{
-			// const char *section_name = file->strtab + file->shdr[i].sh_name;
-			//ft_printf("[DEBUG] Section %d: %s\n", i, section_name);
 			if (file->u.file64.shdr[i].sh_type == SHT_SYMTAB) { 
-				// ft_printf("%s[DEBUG] Found symbol table in section: %s%s\n", GREEN, section_name, RESET);
 				file->u.file64.symtab = (Elf64_Sym *)(file->data + file->u.file64.shdr[i].sh_offset);
 				file->u.file64.symtab_size = file->u.file64.shdr[i].sh_size / sizeof(Elf64_Sym);
 				file->u.file64.strtab = (char *)(file->data + file->u.file64.shdr[file->u.file64.shdr[i].sh_link].sh_offset);
@@ -168,9 +168,6 @@ static void find_symtab(t_file *file)
 			i++;
 		}
 	}
-
-/* 	ft_putstr_fd(YELLOW, 1);
-	ft_printf("[DEBUG] No symbol table found in file: %s%s\n", file->filename, RESET); */
 }
 
 static void add_symbol_to_file(t_file *file, t_symbol *symbol)
