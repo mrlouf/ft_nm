@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/17 10:59:23 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 11:09:37 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,10 +87,10 @@ typedef struct s_file_64 {
 	int				symtab_size;
 }	t_file_64;
 
-typedef union u_file {
+typedef union u_file_data {
 	t_file_32		file32;
 	t_file_64		file64;
-}	t_file_union;
+}	t_file_data;
 
 typedef struct s_file
 {
@@ -99,7 +99,7 @@ typedef struct s_file
 	size_t	size;
 
 	unsigned char	elf_class;
-	u_file_union	u;
+	t_file_data		u;
 
 	t_symbol_list	symbols;
 	
@@ -122,7 +122,7 @@ void	nm_parse_args(int argc, char **argv, t_nm *nm);
 void	nm_process_files(t_nm *nm);
 void	sort_symbols(t_symbol_list *list, unsigned char flags);
 void	nm_print_symbols(t_nm *nm);
-int		check_elf_magic(Elf64_Ehdr *ehdr);
+int		check_elf_magic(t_file *file);
 
 void	nm_error(const char *msg);
 void	nm_warning(const char *msg, const char *detail);

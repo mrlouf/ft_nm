@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 10:47:46 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 11:58:35 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,18 +23,23 @@ static int	parse_elf_headers(t_file *file)
 	if (e_ident[EI_CLASS] == ELFCLASS32) {
 
 		file->elf_class = ELFCLASS32;
-		Elf32_Ehdr *ehdr32 = (Elf32_Ehdr *)file->data;
-		file->ehdr = (Elf64_Ehdr *)ehdr32;
+		file->u.file32.ehdr = (Elf32_Ehdr *)file->data;
 		
 	} else if (e_ident[EI_CLASS] == ELFCLASS64) {
 		
 		file->elf_class = ELFCLASS64;
-		Elf64_Ehdr *ehdr64 = (Elf64_Ehdr *)file->data;
+		file->u.file64.ehdr = (Elf64_Ehdr *)file->data;
+	}
+	else {
+		ft_putstr_fd(RED, 2);
+		ft_putstr_fd("ft_nm: ", 2);
+		ft_putstr_fd(file->filename, 2);
+		ft_putendl_fd(": file format not recognized", 2);
+		ft_putstr_fd(RESET, 1);
+		return (1);
 	}
 
-	file->ehdr = (Elf64_Ehdr *)file->data;
-
-	if (check_elf_magic(file->ehdr) != 0) {
+	if (check_elf_magic(file) != 0) {
 		ft_putstr_fd(RED, 2);
 		ft_putstr_fd("ft_nm: ", 2);
 		ft_putstr_fd(file->filename, 2);
@@ -123,23 +128,47 @@ static int	extract_file_data(t_file *file)
 
 static void find_symtab(t_file *file)
 {
-	file->shdr = (Elf64_Shdr *)(file->data + file->ehdr->e_shoff);
-	file->strtab = (char *)(file->data + file->shdr[file->ehdr->e_shstrndx].sh_offset);
-	int i = 0;
+	if (file->elf_class == ELFCLASS32) {
 
-	while (i < file->ehdr->e_shnum)
-	{
-		// const char *section_name = file->strtab + file->shdr[i].sh_name;
-		//ft_printf("[DEBUG] Section %d: %s\n", i, section_name);
-		if (file->shdr[i].sh_type == SHT_SYMTAB) { 
-			// ft_printf("%s[DEBUG] Found symbol table in section: %s%s\n", GREEN, section_name, RESET);
-			file->symtab = (Elf64_Sym *)(file->data + file->shdr[i].sh_offset);
-			file->symtab_size = file->shdr[i].sh_size / sizeof(Elf64_Sym);
-			file->strtab = (char *)(file->data + file->shdr[file->shdr[i].sh_link].sh_offset);
-			return;
+		file->u.file32.shdr = (Elf32_Shdr *)(file->data + file->u.file32.ehdr->e_shoff);
+		file->u.file32.strtab = (char *)(file->data + file->u.file32.shdr[file->u.file32.ehdr->e_shstrndx].sh_offset);
+	
+		int i = 0;
+		while (i < file->u.file32.ehdr->e_shnum)
+		{
+			// const char *section_name = file->strtab + file->shdr[i].sh_name;
+			//ft_printf("[DEBUG] Section %d: %s\n", i, section_name);
+			if (file->u.file32.shdr[i].sh_type == SHT_SYMTAB) { 
+				// ft_printf("%s[DEBUG] Found symbol table in section: %s%s\n", GREEN, section_name, RESET);
+				file->u.file32.symtab = (Elf32_Sym *)(file->data + file->u.file32.shdr[i].sh_offset);
+				file->u.file32.symtab_size = file->u.file32.shdr[i].sh_size / sizeof(Elf32_Sym);
+				file->u.file32.strtab = (char *)(file->data + file->u.file32.shdr[file->u.file32.shdr[i].sh_link].sh_offset);
+				return;
+			}
+			i++;
 		}
-		i++;
+	
+	} else if (file->elf_class == ELFCLASS64) {
+
+		file->u.file64.shdr = (Elf64_Shdr *)(file->data + file->u.file64.ehdr->e_shoff);
+		file->u.file64.strtab = (char *)(file->data + file->u.file64.shdr[file->u.file64.ehdr->e_shstrndx].sh_offset);
+	
+		int i = 0;
+		while (i < file->u.file64.ehdr->e_shnum)
+		{
+			// const char *section_name = file->strtab + file->shdr[i].sh_name;
+			//ft_printf("[DEBUG] Section %d: %s\n", i, section_name);
+			if (file->u.file64.shdr[i].sh_type == SHT_SYMTAB) { 
+				// ft_printf("%s[DEBUG] Found symbol table in section: %s%s\n", GREEN, section_name, RESET);
+				file->u.file64.symtab = (Elf64_Sym *)(file->data + file->u.file64.shdr[i].sh_offset);
+				file->u.file64.symtab_size = file->u.file64.shdr[i].sh_size / sizeof(Elf64_Sym);
+				file->u.file64.strtab = (char *)(file->data + file->u.file64.shdr[file->u.file64.shdr[i].sh_link].sh_offset);
+				return;
+			}
+			i++;
+		}
 	}
+
 /* 	ft_putstr_fd(YELLOW, 1);
 	ft_printf("[DEBUG] No symbol table found in file: %s%s\n", file->filename, RESET); */
 }
@@ -167,7 +196,51 @@ static void add_symbol_to_file(t_file *file, t_symbol *symbol)
 	file->symbols.count++;
 }
 
-static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *ehdr) {
+static char get_symbol32_type(Elf32_Sym *sym, Elf32_Shdr *shdr_table, Elf32_Ehdr *ehdr) {
+
+    unsigned char bind = ELF32_ST_BIND(sym->st_info);
+    unsigned char type = ELF32_ST_TYPE(sym->st_info);
+    Elf32_Half shndx = sym->st_shndx;
+    char c;
+    
+    if (shndx == SHN_UNDEF && bind != STB_WEAK)
+        return 'U';
+    if (shndx == SHN_ABS)
+        c = 'A';
+    else if (shndx == SHN_COMMON)
+        c = 'C';
+    else if (shndx < ehdr->e_shnum) {
+        Elf32_Shdr *section = &shdr_table[shndx];
+        if (section->sh_type == SHT_NOBITS)
+            c = 'B';
+        else if (section->sh_flags & SHF_EXECINSTR)
+            c = 'T';
+        else if (section->sh_flags & SHF_WRITE)
+            c = 'D';
+        else if (section->sh_flags & SHF_ALLOC)
+            c = 'R';
+        else
+            c = 'N';
+    }
+    else {
+        c = '?';
+    }
+    if (bind == STB_WEAK) {
+        if (shndx == SHN_UNDEF)
+            c = 'w';
+        else if (type == STT_OBJECT)
+            c = 'V';
+        else
+            c = 'W';
+    }
+    
+    if (bind == STB_LOCAL && c != 'U' && c != 'w' && c != 'N')
+        c = ft_tolower(c);
+    
+    return c;
+}
+
+static char get_symbol64_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *ehdr) {
 
     unsigned char bind = ELF64_ST_BIND(sym->st_info);
     unsigned char type = ELF64_ST_TYPE(sym->st_info);
@@ -214,43 +287,80 @@ static char get_symbol_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr *
 static void extract_symbols(t_file *file, unsigned char flags)
 {
     find_symtab(file);
-    if (file->symtab == NULL) {
+    if ((file->elf_class == ELFCLASS64 && file->u.file64.symtab == NULL)
+	|| (file->elf_class == ELFCLASS32 && file->u.file32.symtab == NULL)) {
         ft_printf("ft_nm: %s: no symbol\n", file->filename);
         return;
     }
 
-    for (int i = 0; i < file->symtab_size; i++)
-    {
-        Elf64_Sym *sym = &file->symtab[i];
-        char *name;
-        
-/*         // Pour les symboles de type SECTION, récupérer le nom depuis shstrtab
-        if (ELF64_ST_TYPE(sym->st_info) == STT_SECTION || ELF64_ST_TYPE(sym->st_info) == STT_FILE) {
-            if (sym->st_shndx < file->ehdr->e_shnum) {
-                Elf64_Shdr *section = &file->shdr[sym->st_shndx];
-                name = file->strtab + section->sh_name;
-            } else {
-                name = "";
-            }
-        } else {
-            // Cas normal : nom dans strtab
-            name = file->strtab + sym->st_name;
-        } */
+	if (file->elf_class == ELFCLASS32) {
+		for (int i = 0; i < file->u.file32.symtab_size; i++)
+		{
+			Elf32_Sym *sym32 = &file->u.file32.symtab[i];
+			char *name;
+			
+	/*      // Pour les symboles de type SECTION, récupérer le nom depuis shstrtab
+			if (ELF64_ST_TYPE(sym->st_info) == STT_SECTION || ELF64_ST_TYPE(sym->st_info) == STT_FILE) {
+				if (sym->st_shndx < file->ehdr->e_shnum) {
+					Elf64_Shdr *section = &file->shdr[sym->st_shndx];
+					name = file->strtab + section->sh_name;
+				} else {
+					name = "";
+				}
+			} else {
+				// Cas normal : nom dans strtab
+				name = file->strtab + sym->st_name;
+			} */
 
-		name = file->strtab + sym->st_name;
-        
-        if (name[0] == '\0' && !(flags & FLAG_A))
-            continue;
-            
-        t_symbol symbol;
-        symbol.value = sym->st_value;
-        symbol.name = name;
-        symbol.type = get_symbol_type(sym, file->shdr, file->ehdr);
-        symbol.size = sym->st_size;
-        symbol.bind = ELF64_ST_BIND(sym->st_info);
-        symbol.sym_type = ELF64_ST_TYPE(sym->st_info);
-        add_symbol_to_file(file, &symbol);
-    }
+			name = file->u.file32.strtab + sym32->st_name;
+			
+			if (name[0] == '\0' && !(flags & FLAG_A))
+				continue;
+				
+			t_symbol symbol;
+			symbol.value = sym32->st_value;
+			symbol.name = name;
+			symbol.type = get_symbol32_type(sym32, file->u.file32.shdr, file->u.file32.ehdr);
+			symbol.size = sym32->st_size;
+			symbol.bind = ELF32_ST_BIND(sym32->st_info);
+			symbol.sym_type = ELF32_ST_TYPE(sym32->st_info);
+			add_symbol_to_file(file, &symbol);
+		}
+	} else if (file->elf_class == ELFCLASS64) {
+		for (int i = 0; i < file->u.file64.symtab_size; i++)
+		{
+			Elf64_Sym *sym64 = &file->u.file64.symtab[i];
+			char *name;
+			
+	/*      // Pour les symboles de type SECTION, récupérer le nom depuis shstrtab
+			if (ELF64_ST_TYPE(sym->st_info) == STT_SECTION || ELF64_ST_TYPE(sym->st_info) == STT_FILE) {
+				if (sym->st_shndx < file->ehdr->e_shnum) {
+					Elf64_Shdr *section = &file->shdr[sym->st_shndx];
+					name = file->strtab + section->sh_name;
+				} else {
+					name = "";
+				}
+			} else {
+				// Cas normal : nom dans strtab
+				name = file->strtab + sym->st_name;
+			} */
+
+			name = file->u.file64.strtab + sym64->st_name;
+			
+			if (name[0] == '\0' && !(flags & FLAG_A))
+				continue;
+				
+			t_symbol symbol;
+			symbol.value = sym64->st_value;
+			symbol.name = name;
+			symbol.type = get_symbol64_type(sym64, file->u.file64.shdr, file->u.file64.ehdr);
+			symbol.size = sym64->st_size;
+			symbol.bind = ELF64_ST_BIND(sym64->st_info);
+			symbol.sym_type = ELF64_ST_TYPE(sym64->st_info);
+			add_symbol_to_file(file, &symbol);
+		}
+	}
+
 }
 
 static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
