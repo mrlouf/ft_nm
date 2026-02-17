@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 14:41:36 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 14:53:51 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ static void find_symtab(t_file *file)
 				file->u.file32.symtab = (Elf32_Sym *)(file->data + file->u.file32.shdr[i].sh_offset);
 				file->u.file32.symtab_size = file->u.file32.shdr[i].sh_size / sizeof(Elf32_Sym);
 				file->u.file32.strtab = (char *)(file->data + file->u.file32.shdr[file->u.file32.shdr[i].sh_link].sh_offset);
-				file->shstrtab = (char *)file->data + file->u.file32.shdr[file->u.file32.ehdr->e_shstrndx].sh_offset;
+				file->u.file32.shstrtab = (char *)file->data + file->u.file32.shdr[file->u.file32.ehdr->e_shstrndx].sh_offset;
 				return;
 			}
 			i++;
@@ -156,7 +156,7 @@ static void find_symtab(t_file *file)
 				file->u.file64.symtab = (Elf64_Sym *)(file->data + file->u.file64.shdr[i].sh_offset);
 				file->u.file64.symtab_size = file->u.file64.shdr[i].sh_size / sizeof(Elf64_Sym);
 				file->u.file64.strtab = (char *)(file->data + file->u.file64.shdr[file->u.file64.shdr[i].sh_link].sh_offset);
-				file->shstrtab = (char *)file->data + file->u.file64.shdr[file->u.file64.ehdr->e_shstrndx].sh_offset;
+				file->u.file64.shstrtab = (char *)file->data + file->u.file64.shdr[file->u.file64.ehdr->e_shstrndx].sh_offset;
 				return;
 			}
 			i++;
@@ -289,19 +289,6 @@ static void extract_symbols(t_file *file, unsigned char flags)
 		{
 			Elf32_Sym *sym32 = &file->u.file32.symtab[i];
 			char *name;
-			
-	/*      // Pour les symboles de type SECTION, récupérer le nom depuis shstrtab
-			if (ELF64_ST_TYPE(sym->st_info) == STT_SECTION || ELF64_ST_TYPE(sym->st_info) == STT_FILE) {
-				if (sym->st_shndx < file->ehdr->e_shnum) {
-					Elf64_Shdr *section = &file->shdr[sym->st_shndx];
-					name = file->strtab + section->sh_name;
-				} else {
-					name = "";
-				}
-			} else {
-				// Cas normal : nom dans strtab
-				name = file->strtab + sym->st_name;
-			} */
 				
 			t_symbol symbol;
 
@@ -311,7 +298,15 @@ static void extract_symbols(t_file *file, unsigned char flags)
 			symbol.sym_type = ELF32_ST_TYPE(sym32->st_info);
 			symbol.type = get_symbol32_type(sym32, file->u.file32.shdr, file->u.file32.ehdr);
 
-			name = file->u.file32.strtab + sym32->st_name;
+			if (symbol.type == 'N' && sym32->st_shndx < file->u.file32.ehdr->e_shnum) {
+				
+				Elf32_Shdr *section = &file->u.file32.shdr[sym32->st_shndx];
+				name = file->u.file32.shstrtab + section->sh_name;
+
+			} else {
+				name = file->u.file32.strtab + sym32->st_name;
+			}
+
 			if (name[0] == '\0' && !(flags & FLAG_A))
 				continue;
 			symbol.name = name;
@@ -332,13 +327,15 @@ static void extract_symbols(t_file *file, unsigned char flags)
 			symbol.sym_type = ELF64_ST_TYPE(sym64->st_info);
 			symbol.type = get_symbol64_type(sym64, file->u.file64.shdr, file->u.file64.ehdr);
 
-			if (symbol.type == 'N' && sym64->st_shndx < file->u.file64.ehdr->e_shnum) {
+			if ((symbol.type == 'N' || symbol.type == 't') && sym64->st_shndx < file->u.file64.ehdr->e_shnum) {
 				
 				Elf64_Shdr *section = &file->u.file64.shdr[sym64->st_shndx];
-				name = shstrtab + section->sh_name;
+				name = file->u.file64.shstrtab + section->sh_name;
+
 			} else {
 				name = file->u.file64.strtab + sym64->st_name;
 			}
+
 			if (name[0] == '\0' && !(flags & FLAG_A))
 				continue;
 			symbol.name = name;
