@@ -8,6 +8,9 @@ RESET=$'\033[0m'
 mkdir -p test_files
 rm -fr ./test_files/*
 
+TOTAL_TESTS=0
+PASSED_TESTS=0
+
 ################################
 #       Incorrect files        #
 ################################
@@ -38,12 +41,14 @@ for file in test_files/*; do
     STATUS1=$?
     nm "$file" > ./test_files/test2;
     STATUS2=$?
+    TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if [ $STATUS1 -ne $STATUS2 ]; then
         echo "$RED Test failed for $file $RESET"
         echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
         echo ""
+        PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
 
@@ -68,12 +73,14 @@ files=("ft_nm"
 for file in "${files[@]}"; do
     ./ft_nm "$file" > ./test_files/test1;
     nm "$file" > ./test_files/test2;
+    TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
         echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
         echo ""
+        PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
 
@@ -99,12 +106,14 @@ files=("ft_nm"
 for file in "${files[@]}"; do
     ./ft_nm -r "$file" > ./test_files/test1;
     nm -r "$file" > ./test_files/test2;
+    TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
         echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
         echo ""
+        PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
 
@@ -129,12 +138,14 @@ files=("ft_nm"
 for file in "${files[@]}"; do
     ./ft_nm -p "$file" > ./test_files/test1;
     nm -p "$file" > ./test_files/test2;
+    TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
         echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
         echo ""
+        PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
 
@@ -159,12 +170,14 @@ files=("ft_nm"
 for file in "${files[@]}"; do
     ./ft_nm -a "$file" > ./test_files/test1;
     nm -a "$file" > ./test_files/test2;
+    TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
         echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
         echo ""
+        PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
 
@@ -189,12 +202,14 @@ files=("ft_nm"
 for file in "${files[@]}"; do
     ./ft_nm -g "$file" > ./test_files/test1;
     nm -g "$file" > ./test_files/test2;
+    TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
         echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
         echo ""
+        PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
 
@@ -219,12 +234,14 @@ files=("ft_nm"
 for file in "${files[@]}"; do
     ./ft_nm -u "$file" > ./test_files/test1;
     nm -u "$file" > ./test_files/test2;
+    TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
         echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
         echo ""
+        PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
 
@@ -254,11 +271,29 @@ echo "Testing 32-bit ELF file..."
 ./ft_nm ./test_files/elf32 > ./test_files/test1;
 nm ./test_files/elf32 > ./test_files/test2;
 
+TOTAL_TESTS=$((TOTAL_TESTS + 1))
+
 if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
     echo "$RED Test failed for 32-bit ELF file $RESET"
     echo ""
 else
     echo "$GREEN Test passed for 32-bit ELF file $RESET"
     echo ""
+    PASSED_TESTS=$((PASSED_TESTS + 1))
 fi
 
+################################
+#        Final results         #
+################################
+
+echo ""
+echo "** FINAL RESULTS: **"
+echo ""
+
+if [ $PASSED_TESTS -eq $TOTAL_TESTS ]; then
+    echo "$GREEN All tests passed: $PASSED_TESTS/$TOTAL_TESTS $RESET"
+else
+    echo "$RED Some tests failed: $PASSED_TESTS/$TOTAL_TESTS $RESET"
+fi
+
+echo ""
