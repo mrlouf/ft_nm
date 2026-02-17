@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 11:58:35 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 12:11:10 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -381,21 +381,34 @@ static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 
 static void print_values(t_file *file, t_symbol *sym)
 {
-	char *padding = NULL;
-	(void)file;
-	(void)padding;
+	char *zero_padding = NULL;
+	char *space_padding = NULL;
+
+	if (file->elf_class == ELFCLASS32)
+	{
+		zero_padding = "00000000";
+		space_padding = "        ";
+	}
+	else if (file->elf_class == ELFCLASS64)
+	{
+		zero_padding = "0000000000000000";
+		space_padding = "                ";
+	}
 	
 	if (sym->value != 0 || sym->type == 'T' || sym->type == 't') {
 		
- 		printf("%016lx", sym->value);
+ 		if (file->elf_class == ELFCLASS32)
+			printf("%08lx", sym->value);
+		else if (file->elf_class == ELFCLASS64)
+			printf("%016lx", sym->value);
 		fflush(stdout);
 
 	}
 	else if (sym->type == 'a') {
-		ft_printf("%s", "0000000000000000");
+		ft_printf("%s", zero_padding);
 	}
 	else {
-		ft_printf("%s", "                ");
+		ft_printf("%s", space_padding);
 	}
 
 		ft_printf(" %c %s\n", sym->type, sym->name);
