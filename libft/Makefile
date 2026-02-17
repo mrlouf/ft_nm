@@ -19,7 +19,8 @@ SRCS		=	ft_atoi.c ft_bzero.c ft_calloc.c ft_isalnum.c ft_isalpha.c 	\
 			ft_lstadd_front.c ft_lstsize.c ft_lstlast.c ft_lstadd_back.c 	\
 			ft_lstdelone.c ft_lstclear.c ft_lstiter.c ft_lstmap.c			\
 			get_next_line.c ft_atoi_base.c cucufu.c free_array.c			\
-			print_array.c ft_strcmp.c
+			print_array.c ft_strcmp.c ft_strtolower.c ft_strcasecmp.c		\
+			ft_strtoupper.c
 
 			
 OBJS		:=	$(SRCS:%.c=%.o)

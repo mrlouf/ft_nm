@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nponchon <nponchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 12:20:08 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/10 16:40:58 by nponchon         ###   ########.fr       */
+/*   Updated: 2026/02/15 18:40:32 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,12 @@ size_t		ft_strlcpy(char *dst, const char *src, size_t size);
 size_t		ft_strlcat(char *dst, const char *src, size_t size);
 int			ft_toupper(int c);
 int			ft_tolower(int c);
+char		*ft_strtolower(char *str);
+char		*ft_strtoupper(char *str);
 char		*ft_strchr(const char *s, int c);
 char		*ft_strrchr(const char *s, int c);
 int			ft_strcmp(const char *s1, const char *s2);
+int			ft_strcasecmp(const char *s1, const char *s2);
 int			ft_strncmp(const char *s1, const char *s2, size_t len);
 void		*ft_memchr(const void *s, int c, size_t len);
 int			ft_memcmp(const void *b1, const void *b2, size_t len);

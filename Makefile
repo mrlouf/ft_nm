@@ -6,7 +6,7 @@
 #    By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#              #
-#    Updated: 2026/02/12 13:02:21 by nicolas          ###   ########.fr        #
+#    Updated: 2026/02/16 18:56:57 by nicolas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,8 @@ LIBFT_DIR	= libft
 SRC			= main.c		\
 			parse.c			\
 			process.c		\
-			utils.c
+			utils.c			\
+			sort.c
 
 SRCDIR		= src
 SRCS		= $(addprefix $(SRCDIR)/, $(SRC))
@@ -39,6 +40,7 @@ INCLUDES	= -I$(INC_DIR) -I$(LIBFT_DIR)
 LDFLAGS		= -L$(LIBFT_DIR) -lft
 DFLAGS		= -MT $@ -MMD -MP
 
+RED			= \033[0;31m
 GREEN		= \033[0;32m
 YELLOW		= \033[0;33m
 RESET		= \033[0m
@@ -74,8 +76,14 @@ clean:
 fclean: clean
 	@echo "$(YELLOW)Removing binaries...$(RESET)"
 	@$(MAKE) -C $(LIBFT_DIR) fclean
-	@/bin/rm -f $(NAME)
+	@/bin/rm -f $(NAME) $(DEPS) -r $(DEPDIR) $(OBJDIR)
 	@echo "$(GREEN)Full clean complete!$(RESET)"
+
+test: all
+	@echo ""
+	@echo "$(YELLOW)Running tests...$(RESET)"
+	@echo ""
+	@./generate_tests.sh
 
 re: fclean all
 

@@ -1,29 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_strcasecmp.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/16 18:31:06 by nicolas          ###   ########.fr       */
+/*   Created: 2026/02/15 18:32:36 by nicolas           #+#    #+#             */
+/*   Updated: 2026/02/15 18:41:06 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/nm.h"
+#include "libft.h"
 
-int	main(int argc, char **argv)
+int    ft_strcasecmp(const char *s1, const char *s2)
 {
-	t_nm	nm;
-	int		res;
+    unsigned char	c1;
+    unsigned char	c2;
 
-	ft_memset(&nm, 0, sizeof(t_nm));
-
-	nm_parse_args(argc, argv, &nm);
-	nm_process_files(&nm);
-
-	res = nm.exit_code;
-	nm_cleanup(&nm);
-	
-	return (res);
+    while (*s1 && *s2)
+    {
+        c1 = (unsigned char)ft_toupper(*s1);
+        c2 = (unsigned char)ft_toupper(*s2);
+        if (c1 != c2)
+            return (c1 - c2);
+        s1++;
+        s2++;
+    }
+    return ((unsigned char)ft_toupper(*s1) - (unsigned char)ft_toupper(*s2));
 }

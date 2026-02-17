@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/12 11:12:28 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/16 17:38:19 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,86 @@ static void	print_usage(void)
 {
 	ft_putstr_fd("Usage: ft_nm [options] <file>...\n", 2);
 	ft_putstr_fd("Options:\n", 2);
-	ft_putstr_fd("  -a, --all           	Display all symbols, even debugger-only symbols\n", 2);
+	ft_putstr_fd("  -a, --debug-syms	Display all symbols, even debugger-only symbols\n", 2);
 	ft_putstr_fd("  -g, --extern-only  	Only external symbols\n", 2);
-	ft_putstr_fd("  -u, --undefined-only	Sort by address\n", 2);
-	ft_putstr_fd("  -r, --reverse       	Sort in reverse order\n", 2);
+	ft_putstr_fd("  -u, --undefined-only	Only undefined symbols\n", 2);
+	ft_putstr_fd("  -r, --reverse-sort    Sort in reverse order\n", 2);
 	ft_putstr_fd("  -p, --no-sort       	Do not sort\n", 2);
 	exit(1);
+}
+
+static void invalid_option_error(char flag_char, char *flag_str)
+{
+	ft_putstr_fd(RED, 2);
+	ft_putstr_fd("ft_nm: invalid option -- '", 2);
+	if (flag_char)
+		ft_putchar_fd(flag_char, 2);
+	else if (flag_str)
+		ft_putstr_fd(flag_str, 2);
+	ft_putendl_fd("'", 2);
+	ft_putstr_fd(RESET, 1);
+	print_usage();
+}
+
+static void parse_short_flags(unsigned char *flags, char flag_char)
+{
+	if (flag_char == 'a') {
+		*flags |= FLAG_A;
+		*flags &= ~FLAG_G;
+		*flags &= ~FLAG_U;
+	}
+	else if (flag_char == 'g') {
+		*flags |= FLAG_G;
+		*flags &= ~FLAG_A;
+		*flags &= ~FLAG_U;
+	}
+	else if (flag_char == 'u') {
+		*flags |= FLAG_U;
+		*flags &= ~FLAG_A;
+		*flags &= ~FLAG_G;
+	}
+	else if (flag_char == 'r') {
+		*flags |= FLAG_R;
+		*flags &= ~FLAG_P;
+	}
+	else if (flag_char == 'p') {
+		*flags |= FLAG_P;
+		*flags &= ~FLAG_R;
+	}
+	else
+		invalid_option_error(flag_char, 0);
+}
+
+static void parse_long_flags(unsigned char *flags, char *flag_str)
+{
+	if (ft_strcmp(flag_str, "") == 0)
+		invalid_option_error(0, flag_str);
+
+	if (ft_strcmp(flag_str, "debug-syms") == 0) {
+		*flags |= FLAG_A;
+		*flags &= ~FLAG_G;
+		*flags &= ~FLAG_U;
+	}
+	else if (ft_strcmp(flag_str, "extern-only") == 0) {
+		*flags |= FLAG_G;
+		*flags &= ~FLAG_A;
+		*flags &= ~FLAG_U;
+	}
+	else if (ft_strcmp(flag_str, "undefined-only") == 0) {
+		*flags |= FLAG_U;
+		*flags &= ~FLAG_A;
+		*flags &= ~FLAG_G;
+	}
+	else if (ft_strcmp(flag_str, "reverse-sort") == 0) {
+		*flags |= FLAG_R;
+		*flags &= ~FLAG_P;
+	}
+	else if (ft_strcmp(flag_str, "no-sort") == 0) {
+		*flags |= FLAG_P;
+		*flags &= ~FLAG_R;
+	}
+	else
+		invalid_option_error(0, flag_str);
 }
 
 static void	parse_flags(int argc, char **argv, t_nm *nm)
@@ -37,27 +111,15 @@ static void	parse_flags(int argc, char **argv, t_nm *nm)
 			i++;
 			continue;
 		}
+		if (argv[i][0] == '-' && argv[i][1] == '-') {
+			parse_long_flags(&nm->flags, argv[i] + 2);
+			total_flags++;
+			i++;
+			continue;
+		}
 		while (argv[i][j] != '\0')
 		{
-			if (argv[i][j] == 'a')
-				nm->flags |= 0x01; // Display all symbols, even debugger-only symbols
-			else if (argv[i][j] == 'g')
-				nm->flags |= 0x02; // Only external symbols
-			else if (argv[i][j] == 'u')
-				nm->flags |= 0x04; // Sort by address
-			else if (argv[i][j] == 'r')
-				nm->flags |= 0x08; // Sort in reverse order
-			else if (argv[i][j] == 'p')
-				nm->flags |= 0x10; // Do not sort
-			else
-			{
-				ft_putstr_fd(RED, 2);
-				ft_putstr_fd("ft_nm: invalid option -- '", 2);
-				ft_putchar_fd(argv[i][j], 2);
-				ft_putendl_fd("'", 2);
-				ft_putstr_fd(RESET, 2);
-				print_usage();
-			}
+			parse_short_flags(&nm->flags, argv[i][j]);
 			j++;
 		}
 		total_flags++;
@@ -65,18 +127,16 @@ static void	parse_flags(int argc, char **argv, t_nm *nm)
 		j = 1;
 	}
 	nm->file_count = argc - total_flags - 1;
-	ft_printf("[DEBUG] Number of flags: %d\n", total_flags);
-	ft_printf("[DEBUG] Number of files to process: %d\n", nm->file_count);
+/* 	ft_printf("[DEBUG] Number of flags: %d\n", total_flags);
+	ft_printf("[DEBUG] Number of files to process: %d\n", nm->file_count); */
 }
 
 static void	get_default_filename(t_nm *nm)
 {
 	nm->files = malloc(sizeof(t_file) * 2); // 1 for a.out + 1 for NULL terminator
 	if (!nm->files)
-	{
-		ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
-		exit(1);
-	}
+		nm_error("memory allocation failed");
+
 	ft_bzero(nm->files, sizeof(t_file) * 2);
 
 	nm->files[0].filename = DEFAULT_FILENAME;
@@ -87,15 +147,13 @@ static void	parse_files(char **argv, t_nm *nm)
 {
 	nm->files = malloc(sizeof(t_file) * (nm->file_count + 1));
 	if (!nm->files)
-	{
-		ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
-		exit(1);
-	}
+		nm_error("memory allocation failed");
+	
 	ft_bzero(nm->files, sizeof(t_file) * (nm->file_count + 1));
 	
 	int i = 1;
 	int file_index = 0;
-	while (argv[i] )
+	while (argv[i])
 	{
 		if (argv[i][0] == '-') {
 			i++;
@@ -103,11 +161,9 @@ static void	parse_files(char **argv, t_nm *nm)
 		}
 		nm->files[file_index].filename = argv[i];
 		if (!nm->files[file_index].filename)
-		{
-			ft_putstr_fd("ft_nm: memory allocation failed\n", 2);
-			exit(1);
-		}
-		ft_printf("[DEBUG] Parsed file: %s\n", nm->files[file_index].filename);
+			nm_error("memory allocation failed");
+
+		// ft_printf("[DEBUG] Parsed file: %s\n", nm->files[file_index].filename);
 		i++;
 		file_index++;
 	}
@@ -119,11 +175,11 @@ void	nm_parse_args(int argc, char **argv, t_nm *nm)
 	parse_flags(argc, argv, nm);
 
 	if (nm->file_count == 0) {
-		ft_printf("%s[DEBUG] No files specified, will default to a.out%s\n", YELLOW, RESET);
+		// ft_printf("%s[DEBUG] No files specified, will default to a.out%s\n", YELLOW, RESET);
 		get_default_filename(nm);
 	}
 	else {
-		ft_printf("[DEBUG] Files to process: %d\n", nm->file_count);
+		// ft_printf("[DEBUG] Files to process: %d\n", nm->file_count);
 		parse_files(argv, nm);
 	}
 
