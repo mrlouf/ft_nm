@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/17 13:28:39 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 14:40:40 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ typedef struct s_file_32 {
 	Elf32_Sym		*symtab;
 	
 	char			*strtab;
+	char			*shstrtab;
 	int				symtab_size;
 }	t_file_32;
 
@@ -87,6 +88,7 @@ typedef struct s_file_64 {
 	Elf64_Sym		*symtab;
 	
 	char			*strtab;
+	char			*shstrtab;
 	int				symtab_size;
 }	t_file_64;
 

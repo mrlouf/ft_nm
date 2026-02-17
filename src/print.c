@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 13:14:12 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 13:27:34 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 14:23:29 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ static void print_values(t_file *file, t_symbol *sym)
 		fflush(stdout);
 
 	}
-	else if (sym->type == 'a') {
+	else if (sym->type == 'a' || sym->type == 'N') {
 
 		if (file->elf_class == ELFCLASS32)
 			ft_printf("%s", ZERO_PADDING_32);
