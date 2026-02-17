@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 13:35:53 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/16 18:21:32 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 12:55:10 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ static void sort_symbols_in_array(t_symbol_node ***array, size_t count, unsigned
     }
 }
 
-void sort_symbols(t_symbol_list *list, unsigned char flags)
+void nm_sort_symbols(t_symbol_list *list, unsigned char flags)
 {
     if (list->count <= 1 || (flags & FLAG_P))
         return; // No need to sort if 0 or 1 symbol, or if -p flag is set

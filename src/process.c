@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 12:30:42 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 13:08:29 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,12 @@
 
 static int	parse_elf_headers(t_file *file)
 {
-/* 	ft_putstr_fd(BLUE, 1);
-	ft_printf("[DEBUG] Parsing mapping of file: %s\n", file->filename);
-	ft_printf("[DEBUG] Mapped at %p\n", file->data); */
-
 	unsigned char *e_ident = (unsigned char *)file->data;
+
+	if (e_ident[EI_DATA] != ELFDATA2LSB) {
+		nm_warning(file->filename, ": big-endian files are not supported");
+		return (1);
+	}
 
 	if (e_ident[EI_CLASS] == ELFCLASS32) {
 
@@ -31,45 +32,15 @@ static int	parse_elf_headers(t_file *file)
 		file->u.file64.ehdr = (Elf64_Ehdr *)file->data;
 	}
 	else {
-		ft_putstr_fd(RED, 2);
-		ft_putstr_fd("ft_nm: ", 2);
-		ft_putstr_fd(file->filename, 2);
-		ft_putendl_fd(": file format not recognized", 2);
-		ft_putstr_fd(RESET, 1);
+		nm_warning(file->filename, ": file format not recognized");
 		return (1);
 	}
 
 	if (check_elf_magic(file) != 0) {
-		ft_putstr_fd(RED, 2);
-		ft_putstr_fd("ft_nm: ", 2);
-		ft_putstr_fd(file->filename, 2);
-		ft_putendl_fd(": file format not recognized", 2);
-		ft_putstr_fd(RESET, 1);
+		nm_warning(file->filename, ": file format not recognized");
 		return (1);
 	}
 
-/* 	ft_printf("[DEBUG] ELF file detected: %s of type: ", file->filename);
-	switch (file->ehdr->e_type) {
-		case ET_REL:    // Relocatable file (.o)
-			printf("Object file\n");
-			break;
-		case ET_EXEC:   // Executable file
-			printf("Executable\n");
-			break;
-		case ET_DYN:    // Shared object (.so) ou PIE executable
-			printf("Shared library or PIE executable\n");
-			break;
-		case ET_CORE:   // Core dump
-			printf("Core file\n");
-			break;
-		default:
-			fprintf(stderr, "Unknown ELF type\n");
-			return (1);
-	} */
-	
-/* 	printf("[DEBUG] Entry point: 0x%lx\n", file->ehdr->e_entry);
-	ft_putstr_fd(RESET, 1);
- */
 	return (0);
 }
 
@@ -444,7 +415,7 @@ void nm_process_files(t_nm *nm)
 		}
 
 		extract_symbols(&nm->files[i], nm->flags);
-		sort_symbols(&nm->files[i].symbols, nm->flags);
+		nm_sort_symbols(&nm->files[i].symbols, nm->flags);
 		print_symbols(&nm->files[i], nm->flags);
 		nm_unmap_file(&nm->files[i]);
 		i++;
