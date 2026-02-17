@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 10:37:55 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 10:47:46 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,20 @@ static int	parse_elf_headers(t_file *file)
 /* 	ft_putstr_fd(BLUE, 1);
 	ft_printf("[DEBUG] Parsing mapping of file: %s\n", file->filename);
 	ft_printf("[DEBUG] Mapped at %p\n", file->data); */
-/* 
+
 	unsigned char *e_ident = (unsigned char *)file->data;
 
-	// Vérifier le type
 	if (e_ident[EI_CLASS] == ELFCLASS32) {
-		Elf32_Ehdr *ehdr32 = (Elf32_Ehdr *)data;
-		// Traiter comme 32 bits
+
+		file->elf_class = ELFCLASS32;
+		Elf32_Ehdr *ehdr32 = (Elf32_Ehdr *)file->data;
+		file->ehdr = (Elf64_Ehdr *)ehdr32;
+		
 	} else if (e_ident[EI_CLASS] == ELFCLASS64) {
-		Elf64_Ehdr *ehdr64 = (Elf64_Ehdr *)data;
-		// Traiter comme 64 bits
-	} */
+		
+		file->elf_class = ELFCLASS64;
+		Elf64_Ehdr *ehdr64 = (Elf64_Ehdr *)file->data;
+	}
 
 	file->ehdr = (Elf64_Ehdr *)file->data;
 
@@ -112,7 +115,6 @@ static int	extract_file_data(t_file *file)
 
 	file->data = mmap(NULL, file->size, PROT_READ, MAP_PRIVATE, fd, 0);
 	close(fd);
-	
 	if (file->data == MAP_FAILED)
 		nm_error("mmap failed");
 

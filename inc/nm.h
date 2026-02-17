@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/16 19:18:24 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 10:59:23 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,18 +69,38 @@ typedef struct s_symbol_list {
     size_t          count;
 }	t_symbol_list;
 
-typedef struct s_file
-{
-	char	*filename;
-	void	*data;
-	size_t	size;
+typedef struct s_file_32 {
+	Elf32_Ehdr		*ehdr;
+	Elf32_Shdr		*shdr;
+	Elf32_Sym		*symtab;
+	
+	char			*strtab;
+	int				symtab_size;
+}	t_file_32;
 
+typedef struct s_file_64 {
 	Elf64_Ehdr		*ehdr;
 	Elf64_Shdr		*shdr;
 	Elf64_Sym		*symtab;
 	
 	char			*strtab;
 	int				symtab_size;
+}	t_file_64;
+
+typedef union u_file {
+	t_file_32		file32;
+	t_file_64		file64;
+}	t_file_union;
+
+typedef struct s_file
+{
+	char	*filename;
+	void	*data;
+	size_t	size;
+
+	unsigned char	elf_class;
+	u_file_union	u;
+
 	t_symbol_list	symbols;
 	
 }	t_file;
