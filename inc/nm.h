@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/17 12:55:02 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 13:17:37 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ typedef struct s_symbol {
     char            type;
     char            *name;
 
-	// Optionalfields for sorting and printing
 	uint64_t    	size;
     unsigned char 	bind;
     unsigned char 	sym_type;
@@ -121,16 +120,12 @@ typedef struct s_nm
 void	nm_parse_args(int argc, char **argv, t_nm *nm);
 void	nm_process_files(t_nm *nm);
 void	nm_sort_symbols(t_symbol_list *list, unsigned char flags);
-void	nm_print_symbols(t_nm *nm);
-int		check_elf_magic(t_file *file);
+void	nm_print_symbols(t_file *file, unsigned char flags);
 
 void	nm_error(const char *msg);
 void	nm_warning(const char *msg, const char *detail);
 
 void	nm_unmap_file(t_file *file);
 void	nm_cleanup(t_nm *nm);
-
-// Symbol list management
-
 
 #endif
