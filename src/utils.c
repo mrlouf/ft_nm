@@ -6,32 +6,12 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/12 13:00:09 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 11:57:25 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 13:16:54 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/nm.h"
 
-int	check_elf_magic(t_file *file)
-{
-	if (file->elf_class == ELFCLASS32) {
-		Elf32_Ehdr *ehdr = file->u.file32.ehdr;
-		
-		return (ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
-			ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
-			ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
-			ehdr->e_ident[EI_MAG3] != ELFMAG3);
-	}
-	else if (file->elf_class == ELFCLASS64) {
-		Elf64_Ehdr *ehdr = file->u.file64.ehdr;
-
-		return (ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
-			ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
-			ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
-			ehdr->e_ident[EI_MAG3] != ELFMAG3);
-	}
-	return (1);
-}
 
 void	nm_cleanup(t_nm *nm)
 {

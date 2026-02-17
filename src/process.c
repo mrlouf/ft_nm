@@ -6,19 +6,41 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 12:30:42 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 16:03:31 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/nm.h"
 
+static int	check_elf_magic(t_file *file)
+{
+	if (file->elf_class == ELFCLASS32) {
+		Elf32_Ehdr *ehdr = file->u.file32.ehdr;
+		
+		return (ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
+			ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
+			ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
+			ehdr->e_ident[EI_MAG3] != ELFMAG3);
+	}
+	else if (file->elf_class == ELFCLASS64) {
+		Elf64_Ehdr *ehdr = file->u.file64.ehdr;
+
+		return (ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
+			ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
+			ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
+			ehdr->e_ident[EI_MAG3] != ELFMAG3);
+	}
+	return (1);
+}
+
 static int	parse_elf_headers(t_file *file)
 {
-/* 	ft_putstr_fd(BLUE, 1);
-	ft_printf("[DEBUG] Parsing mapping of file: %s\n", file->filename);
-	ft_printf("[DEBUG] Mapped at %p\n", file->data); */
-
 	unsigned char *e_ident = (unsigned char *)file->data;
+
+	if (e_ident[EI_DATA] != ELFDATA2LSB) {
+		nm_warning(file->filename, ": big-endian files are not supported");
+		return (1);
+	}
 
 	if (e_ident[EI_CLASS] == ELFCLASS32) {
 
@@ -31,45 +53,15 @@ static int	parse_elf_headers(t_file *file)
 		file->u.file64.ehdr = (Elf64_Ehdr *)file->data;
 	}
 	else {
-		ft_putstr_fd(RED, 2);
-		ft_putstr_fd("ft_nm: ", 2);
-		ft_putstr_fd(file->filename, 2);
-		ft_putendl_fd(": file format not recognized", 2);
-		ft_putstr_fd(RESET, 1);
+		nm_warning(file->filename, ": file format not recognized");
 		return (1);
 	}
 
 	if (check_elf_magic(file) != 0) {
-		ft_putstr_fd(RED, 2);
-		ft_putstr_fd("ft_nm: ", 2);
-		ft_putstr_fd(file->filename, 2);
-		ft_putendl_fd(": file format not recognized", 2);
-		ft_putstr_fd(RESET, 1);
+		nm_warning(file->filename, ": file format not recognized");
 		return (1);
 	}
 
-/* 	ft_printf("[DEBUG] ELF file detected: %s of type: ", file->filename);
-	switch (file->ehdr->e_type) {
-		case ET_REL:    // Relocatable file (.o)
-			printf("Object file\n");
-			break;
-		case ET_EXEC:   // Executable file
-			printf("Executable\n");
-			break;
-		case ET_DYN:    // Shared object (.so) ou PIE executable
-			printf("Shared library or PIE executable\n");
-			break;
-		case ET_CORE:   // Core dump
-			printf("Core file\n");
-			break;
-		default:
-			fprintf(stderr, "Unknown ELF type\n");
-			return (1);
-	} */
-	
-/* 	printf("[DEBUG] Entry point: 0x%lx\n", file->ehdr->e_entry);
-	ft_putstr_fd(RESET, 1);
- */
 	return (0);
 }
 
@@ -140,6 +132,7 @@ static void find_symtab(t_file *file)
 				file->u.file32.symtab = (Elf32_Sym *)(file->data + file->u.file32.shdr[i].sh_offset);
 				file->u.file32.symtab_size = file->u.file32.shdr[i].sh_size / sizeof(Elf32_Sym);
 				file->u.file32.strtab = (char *)(file->data + file->u.file32.shdr[file->u.file32.shdr[i].sh_link].sh_offset);
+				file->u.file32.shstrtab = (char *)file->data + file->u.file32.shdr[file->u.file32.ehdr->e_shstrndx].sh_offset;
 				return;
 			}
 			i++;
@@ -163,6 +156,7 @@ static void find_symtab(t_file *file)
 				file->u.file64.symtab = (Elf64_Sym *)(file->data + file->u.file64.shdr[i].sh_offset);
 				file->u.file64.symtab_size = file->u.file64.shdr[i].sh_size / sizeof(Elf64_Sym);
 				file->u.file64.strtab = (char *)(file->data + file->u.file64.shdr[file->u.file64.shdr[i].sh_link].sh_offset);
+				file->u.file64.shstrtab = (char *)file->data + file->u.file64.shdr[file->u.file64.ehdr->e_shstrndx].sh_offset;
 				return;
 			}
 			i++;
@@ -295,136 +289,59 @@ static void extract_symbols(t_file *file, unsigned char flags)
 		{
 			Elf32_Sym *sym32 = &file->u.file32.symtab[i];
 			char *name;
-			
-	/*      // Pour les symboles de type SECTION, récupérer le nom depuis shstrtab
-			if (ELF64_ST_TYPE(sym->st_info) == STT_SECTION || ELF64_ST_TYPE(sym->st_info) == STT_FILE) {
-				if (sym->st_shndx < file->ehdr->e_shnum) {
-					Elf64_Shdr *section = &file->shdr[sym->st_shndx];
-					name = file->strtab + section->sh_name;
-				} else {
-					name = "";
-				}
-			} else {
-				// Cas normal : nom dans strtab
-				name = file->strtab + sym->st_name;
-			} */
-
-			name = file->u.file32.strtab + sym32->st_name;
-			
-			if (name[0] == '\0' && !(flags & FLAG_A))
-				continue;
 				
 			t_symbol symbol;
+
 			symbol.value = sym32->st_value;
-			symbol.name = name;
-			symbol.type = get_symbol32_type(sym32, file->u.file32.shdr, file->u.file32.ehdr);
 			symbol.size = sym32->st_size;
 			symbol.bind = ELF32_ST_BIND(sym32->st_info);
 			symbol.sym_type = ELF32_ST_TYPE(sym32->st_info);
+			symbol.type = get_symbol32_type(sym32, file->u.file32.shdr, file->u.file32.ehdr);
+
+			if (sym32->st_name == 0 && ELF32_ST_TYPE(sym32->st_info) == STT_SECTION) {
+				name = file->u.file32.shstrtab + file->u.file32.shdr[sym32->st_shndx].sh_name;
+			} else {
+				name = file->u.file32.strtab + sym32->st_name;
+			}
+
+			if (name[0] == '\0' && !(flags & FLAG_A))
+				continue;
+			symbol.name = name;
+
 			add_symbol_to_file(file, &symbol);
 		}
 	} else if (file->elf_class == ELFCLASS64) {
 		for (int i = 0; i < file->u.file64.symtab_size; i++)
 		{
 			Elf64_Sym *sym64 = &file->u.file64.symtab[i];
-			char *name;
+			char *name = NULL;
 			
-	/*      // Pour les symboles de type SECTION, récupérer le nom depuis shstrtab
-			if (ELF64_ST_TYPE(sym->st_info) == STT_SECTION || ELF64_ST_TYPE(sym->st_info) == STT_FILE) {
-				if (sym->st_shndx < file->ehdr->e_shnum) {
-					Elf64_Shdr *section = &file->shdr[sym->st_shndx];
-					name = file->strtab + section->sh_name;
-				} else {
-					name = "";
-				}
-			} else {
-				// Cas normal : nom dans strtab
-				name = file->strtab + sym->st_name;
-			} */
-
-			name = file->u.file64.strtab + sym64->st_name;
-			
-			if (name[0] == '\0' && !(flags & FLAG_A))
-				continue;
-				
 			t_symbol symbol;
+
 			symbol.value = sym64->st_value;
-			symbol.name = name;
-			symbol.type = get_symbol64_type(sym64, file->u.file64.shdr, file->u.file64.ehdr);
 			symbol.size = sym64->st_size;
 			symbol.bind = ELF64_ST_BIND(sym64->st_info);
 			symbol.sym_type = ELF64_ST_TYPE(sym64->st_info);
+			symbol.type = get_symbol64_type(sym64, file->u.file64.shdr, file->u.file64.ehdr);
+
+			if (sym64->st_name == 0 && ELF64_ST_TYPE(sym64->st_info) == STT_SECTION) {
+				name = file->u.file64.shstrtab + file->u.file64.shdr[sym64->st_shndx].sh_name;
+			} else {
+				name = file->u.file64.strtab + sym64->st_name;
+			}
+
+			if (name[0] == '\0' && !(flags & FLAG_A))
+				continue;
+
+			if (!(flags & FLAG_A) && ELF64_ST_TYPE(sym64->st_info) == STT_SECTION)
+				continue;
+			
+			symbol.name = name;
+
 			add_symbol_to_file(file, &symbol);
 		}
 	}
 
-}
-
-static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
-{
-/* 	if (sym->type == 't')
-		return 0; */
-	if (sym->type == 'U' && sym->name[0] == '\0')
-		return 1; // Skip symbols with null name
-	if (!(flags & FLAG_A) && (sym->type == 'a' || sym->type == 'N'))
-		return 1; // Skip debugger-only symbols if -a is not set
-	if (flags & FLAG_U && sym->type != 'U' && sym->type != 'w')
-		return 1; // Only allow undefined symbols if -u is set
-	if (flags & FLAG_G && !(sym->bind == STB_GLOBAL || sym->bind == STB_WEAK))
-		return 1;
-	
-	return 0;
-}
-
-static void print_values(t_file *file, t_symbol *sym)
-{
-	char *zero_padding = NULL;
-	char *space_padding = NULL;
-
-	if (file->elf_class == ELFCLASS32)
-	{
-		zero_padding = "00000000";
-		space_padding = "        ";
-	}
-	else if (file->elf_class == ELFCLASS64)
-	{
-		zero_padding = "0000000000000000";
-		space_padding = "                ";
-	}
-	
-	if (sym->value != 0 || sym->type == 'T' || sym->type == 't') {
-		
- 		if (file->elf_class == ELFCLASS32)
-			printf("%08lx", sym->value);
-		else if (file->elf_class == ELFCLASS64)
-			printf("%016lx", sym->value);
-		fflush(stdout);
-
-	}
-	else if (sym->type == 'a') {
-		ft_printf("%s", zero_padding);
-	}
-	else {
-		ft_printf("%s", space_padding);
-	}
-
-		ft_printf(" %c %s\n", sym->type, sym->name);
-}
-
-static void print_symbols(t_file *file, unsigned char flags)
-{
-	t_symbol_node *current = file->symbols.head;
-
-	while (current != NULL) {
-
-		t_symbol *sym = &current->symbol;
-
-		if (!symbol_should_be_skipped(sym, flags))
-		{
-			print_values(file, sym);
-		}
-		current = current->next;
-	}
 }
 
 void nm_process_files(t_nm *nm)
@@ -444,9 +361,11 @@ void nm_process_files(t_nm *nm)
 		}
 
 		extract_symbols(&nm->files[i], nm->flags);
-		sort_symbols(&nm->files[i].symbols, nm->flags);
-		print_symbols(&nm->files[i], nm->flags);
+
+		nm_sort_symbols(&nm->files[i].symbols, nm->flags);
+		nm_print_symbols(&nm->files[i], nm->flags);
 		nm_unmap_file(&nm->files[i]);
+
 		i++;
 	}
 }
