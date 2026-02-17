@@ -6,11 +6,23 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 13:14:12 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 16:08:49 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 16:33:28 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/nm.h"
+
+void	nm_print_usage(void)
+{
+	ft_putstr_fd("Usage: ft_nm [options] <file>...\n", 2);
+	ft_putstr_fd("Options:\n", 2);
+	ft_putstr_fd("  -a, --debug-syms	Display all symbols, even debugger-only symbols\n", 2);
+	ft_putstr_fd("  -g, --extern-only  	Only external symbols\n", 2);
+	ft_putstr_fd("  -u, --undefined-only	Only undefined symbols\n", 2);
+	ft_putstr_fd("  -r, --reverse-sort    Sort in reverse order\n", 2);
+	ft_putstr_fd("  -p, --no-sort       	Do not sort\n", 2);
+	exit(1);
+}
 
 static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 {

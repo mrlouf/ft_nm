@@ -44,10 +44,8 @@ for file in test_files/*; do
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if [ $STATUS1 -ne $STATUS2 ]; then
         echo "$RED Test failed for $file $RESET"
-        echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
-        echo ""
         PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
@@ -76,10 +74,8 @@ for file in "${files[@]}"; do
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
-        echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
-        echo ""
         PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
@@ -109,10 +105,8 @@ for file in "${files[@]}"; do
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
-        echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
-        echo ""
         PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
@@ -141,10 +135,8 @@ for file in "${files[@]}"; do
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
-        echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
-        echo ""
         PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
@@ -173,10 +165,8 @@ for file in "${files[@]}"; do
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
-        echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
-        echo ""
         PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
@@ -205,10 +195,8 @@ for file in "${files[@]}"; do
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
-        echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
-        echo ""
         PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
@@ -237,10 +225,8 @@ for file in "${files[@]}"; do
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "$RED Test failed for $file $RESET"
-        echo ""
     else
         echo "$GREEN Test passed for $file $RESET"
-        echo ""
         PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 done
@@ -260,13 +246,13 @@ gcc -m32 ./test_files/test.c -o ./test_files/elf32 2>/dev/null
 
 if [ -f ./test_files/elf32 ]; then
     echo "$GREEN 32-bit ELF test file created successfully $RESET"
-    echo ""
 else
     echo "$RED Failed to create 32-bit ELF test file, skipping test... $RESET"
     exit 1
 fi
 
 echo "Testing 32-bit ELF file..."
+echo ""
 
 ./ft_nm ./test_files/elf32 > ./test_files/test1;
 nm ./test_files/elf32 > ./test_files/test2;
@@ -275,12 +261,100 @@ TOTAL_TESTS=$((TOTAL_TESTS + 1))
 
 if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
     echo "$RED Test failed for 32-bit ELF file $RESET"
-    echo ""
 else
     echo "$GREEN Test passed for 32-bit ELF file $RESET"
-    echo ""
     PASSED_TESTS=$((PASSED_TESTS + 1))
 fi
+
+echo ""
+
+################################
+#     Multiple files test      #
+################################
+
+echo "Testing multiple files..."
+echo ""
+
+./ft_nm ft_nm .obj/main.o .obj/parse.o ./test_files/elf32 > ./test_files/test1
+nm ft_nm .obj/main.o .obj/parse.o ./test_files/elf32 > ./test_files/test2
+
+TOTAL_TESTS=$((TOTAL_TESTS + 1))
+if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
+    echo "${RED} Test failed for multiple files${RESET}"
+else
+    echo "${GREEN} Test passed for multiple files${RESET}"
+    PASSED_TESTS=$((PASSED_TESTS + 1))
+fi
+
+echo ""
+
+################################
+#     Combined flags test      #
+################################
+
+echo "Testing combined flags..."
+echo ""
+
+flag_combos=("-rg" "-ag" "-ru" "-au" "-rp" "-agrup")
+
+for combo in "${flag_combos[@]}"; do
+    ./ft_nm $combo ft_nm > ./test_files/test1
+    nm $combo ft_nm > ./test_files/test2
+    TOTAL_TESTS=$((TOTAL_TESTS + 1))
+    if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
+        echo "${RED} Test failed for flags $combo${RESET}"
+    else
+        echo "${GREEN} Test passed for flags $combo${RESET}"
+        PASSED_TESTS=$((PASSED_TESTS + 1))
+    fi
+done
+
+echo ""
+
+################################
+#       Shared library         #
+################################
+
+echo "Testing shared library..."
+echo ""
+
+echo 'void foo() {} void bar() {}' > test_files/lib.c
+gcc -shared -fPIC test_files/lib.c -o test_files/libtest.so
+
+./ft_nm test_files/libtest.so > ./test_files/test1
+nm test_files/libtest.so > ./test_files/test2
+
+TOTAL_TESTS=$((TOTAL_TESTS + 1))
+if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
+    echo "${RED} Test failed for shared library${RESET}"
+else
+    echo "${GREEN} Test passed for shared library${RESET}"
+    PASSED_TESTS=$((PASSED_TESTS + 1))
+fi
+
+echo ""
+
+################################
+#       Stripped binary        #
+################################
+
+echo "Testing stripped binary..."
+echo ""
+
+strip --strip-all -o test_files/stripped ft_nm
+
+./ft_nm test_files/stripped > ./test_files/test1
+nm test_files/stripped > ./test_files/test2 
+
+TOTAL_TESTS=$((TOTAL_TESTS + 1))
+if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
+    echo "${RED} Test failed for stripped binary${RESET}"
+else
+    echo "${GREEN} Test passed for stripped binary${RESET}"
+    PASSED_TESTS=$((PASSED_TESTS + 1))
+fi
+
+echo ""
 
 ################################
 #        Final results         #

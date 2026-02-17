@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/17 15:29:47 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 16:33:42 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,7 @@ void	nm_process_files(t_nm *nm);
 void	nm_sort_symbols(t_symbol_list *list, unsigned char flags);
 void	nm_print_symbols(t_file *file, unsigned char flags);
 
+void	nm_print_usage(void);
 void	nm_error(const char *msg);
 void	nm_warning(const char *msg, const char *detail);
 

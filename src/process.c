@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 16:03:31 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 16:56:13 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -278,9 +278,10 @@ static char get_symbol64_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr
 static void extract_symbols(t_file *file, unsigned char flags)
 {
     find_symtab(file);
+
     if ((file->elf_class == ELFCLASS64 && file->u.file64.symtab == NULL)
 	|| (file->elf_class == ELFCLASS32 && file->u.file32.symtab == NULL)) {
-        ft_printf("ft_nm: %s: no symbol\n", file->filename);
+		nm_warning(file->filename, ": no symbol");
         return;
     }
 
@@ -363,6 +364,10 @@ void nm_process_files(t_nm *nm)
 		extract_symbols(&nm->files[i], nm->flags);
 
 		nm_sort_symbols(&nm->files[i].symbols, nm->flags);
+		
+		if (nm->file_count > 1)
+			ft_printf("\n%s:\n", nm->files[i].filename);
+		
 		nm_print_symbols(&nm->files[i], nm->flags);
 		nm_unmap_file(&nm->files[i]);
 
