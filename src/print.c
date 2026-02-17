@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 13:14:12 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 14:23:29 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 16:08:49 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 {
-/* 	if (sym->type == 't')
-		return 0; */
 	if (sym->type == 'U' && sym->name[0] == '\0')
 		return 1; // Skip symbols with null name
 	if (!(flags & FLAG_A) && (sym->type == 'a' || sym->type == 'N'))
@@ -39,7 +37,7 @@ static void print_values(t_file *file, t_symbol *sym)
 		fflush(stdout);
 
 	}
-	else if (sym->type == 'a' || sym->type == 'N') {
+	else if (sym->type == 'a' || sym->type == 'N' || sym->type == 'r' ) {
 
 		if (file->elf_class == ELFCLASS32)
 			ft_printf("%s", ZERO_PADDING_32);

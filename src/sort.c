@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 13:35:53 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 12:55:10 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 16:05:56 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,20 @@ static int compare_symbols(const void *a, const void *b)
     t_symbol_node *sym_a = *(t_symbol_node **)a;
     t_symbol_node *sym_b = *(t_symbol_node **)b;
 
+/*     int a_no_addr = (sym_a->symbol.type == 'U' || sym_a->symbol.type == 'u' ||
+                     sym_a->symbol.type == 'w' || sym_a->symbol.type == 'W' ||
+                     sym_a->symbol.type == 'N');
+    int b_no_addr = (sym_b->symbol.type == 'U' || sym_b->symbol.type == 'u' ||
+                     sym_b->symbol.type == 'w' || sym_b->symbol.type == 'W' ||
+                     sym_b->symbol.type == 'N');
+
+    // Les symboles sans adresse viennent en premier
+    if (a_no_addr != b_no_addr)
+        return a_no_addr - b_no_addr; */
+    
     // Trim leading underscores for comparison
-    char *name_a = ft_strtrim(sym_a->symbol.name, "_");
-    char *name_b = ft_strtrim(sym_b->symbol.name, "_");
+    char *name_a = ft_strtrim(sym_a->symbol.name, "_.");
+    char *name_b = ft_strtrim(sym_b->symbol.name, "_.");
     if (!name_a || !name_b)
         nm_error("memory allocation failed");
 

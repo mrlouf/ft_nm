@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 14:53:51 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 16:03:31 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -298,11 +298,8 @@ static void extract_symbols(t_file *file, unsigned char flags)
 			symbol.sym_type = ELF32_ST_TYPE(sym32->st_info);
 			symbol.type = get_symbol32_type(sym32, file->u.file32.shdr, file->u.file32.ehdr);
 
-			if (symbol.type == 'N' && sym32->st_shndx < file->u.file32.ehdr->e_shnum) {
-				
-				Elf32_Shdr *section = &file->u.file32.shdr[sym32->st_shndx];
-				name = file->u.file32.shstrtab + section->sh_name;
-
+			if (sym32->st_name == 0 && ELF32_ST_TYPE(sym32->st_info) == STT_SECTION) {
+				name = file->u.file32.shstrtab + file->u.file32.shdr[sym32->st_shndx].sh_name;
 			} else {
 				name = file->u.file32.strtab + sym32->st_name;
 			}
@@ -317,7 +314,7 @@ static void extract_symbols(t_file *file, unsigned char flags)
 		for (int i = 0; i < file->u.file64.symtab_size; i++)
 		{
 			Elf64_Sym *sym64 = &file->u.file64.symtab[i];
-			char *name;
+			char *name = NULL;
 			
 			t_symbol symbol;
 
@@ -327,17 +324,18 @@ static void extract_symbols(t_file *file, unsigned char flags)
 			symbol.sym_type = ELF64_ST_TYPE(sym64->st_info);
 			symbol.type = get_symbol64_type(sym64, file->u.file64.shdr, file->u.file64.ehdr);
 
-			if ((symbol.type == 'N' || symbol.type == 't') && sym64->st_shndx < file->u.file64.ehdr->e_shnum) {
-				
-				Elf64_Shdr *section = &file->u.file64.shdr[sym64->st_shndx];
-				name = file->u.file64.shstrtab + section->sh_name;
-
+			if (sym64->st_name == 0 && ELF64_ST_TYPE(sym64->st_info) == STT_SECTION) {
+				name = file->u.file64.shstrtab + file->u.file64.shdr[sym64->st_shndx].sh_name;
 			} else {
 				name = file->u.file64.strtab + sym64->st_name;
 			}
 
 			if (name[0] == '\0' && !(flags & FLAG_A))
 				continue;
+
+			if (!(flags & FLAG_A) && ELF64_ST_TYPE(sym64->st_info) == STT_SECTION)
+				continue;
+			
 			symbol.name = name;
 
 			add_symbol_to_file(file, &symbol);

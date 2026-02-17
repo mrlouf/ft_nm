@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/17 14:40:40 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/17 15:29:47 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ typedef struct s_symbol_node {
 }	t_symbol_node;
 
 typedef struct s_symbol_list {
-    t_symbol_node   *head;
+    t_symbol_node	*head;
     size_t          count;
 }	t_symbol_list;
 
