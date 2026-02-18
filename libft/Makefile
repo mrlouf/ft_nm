@@ -56,11 +56,11 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c $(MAKE)
 	@mv $(patsubst %.o,%.d,$@) $(subst $(OBJDIR),$(DEPDIR),$(@D))/
 	
 clean:
-	/bin/rm -f $(OBJS)
-	/bin/rm -f $(DEPS)
+	@/bin/rm -f $(OBJS)
+	@/bin/rm -f $(DEPS)
 
 fclean: clean
-	/bin/rm -f $(NAME)
+	@/bin/rm -f $(NAME)
 
 re: fclean all
 
