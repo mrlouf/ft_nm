@@ -2,13 +2,11 @@
 
 NAME		= 	libft.a
 
-# -=-=-=-=-    PATH -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-
-SRC			= 	.
-
 # -=-=-=-=-    FILES -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 
-SRCS		=	ft_atoi.c ft_bzero.c ft_calloc.c ft_isalnum.c ft_isalpha.c 	\
+SRCDIR		=	src
+
+SRC		=	ft_atoi.c ft_bzero.c ft_calloc.c ft_isalnum.c ft_isalpha.c 	\
 			ft_isascii.c ft_isdigit.c ft_isprint.c ft_itoa.c ft_memchr.c 	\
 			ft_memcmp.c ft_memcpy.c ft_memmove.c ft_memset.c ft_putchar_fd.c\
 			ft_putendl_fd.c ft_putnbr_fd.c ft_putstr_fd.c ft_split.c 		\
@@ -22,10 +20,16 @@ SRCS		=	ft_atoi.c ft_bzero.c ft_calloc.c ft_isalnum.c ft_isalpha.c 	\
 			print_array.c ft_strcmp.c ft_strtolower.c ft_strcasecmp.c		\
 			ft_strtoupper.c
 
+SRCS		= 	$(addprefix $(SRCDIR)/, $(SRC))
 			
-OBJS		:=	$(SRCS:%.c=%.o)
+OBJDIR		= .obj
+OBJS		= $(addprefix $(OBJDIR)/, $(SRC:.c=.o))
 
-HEADER		=	libft.h ft_printf.h
+DEPDIR		= .dep
+DEPS		= $(addprefix $(DEPDIR)/, $(SRC:.c=.d))
+DEPDIRS		= $(DEPDIR)
+
+HEADER		=	./inc/libft.h
 
 MAKE		=	Makefile
 			
@@ -33,24 +37,33 @@ MAKE		=	Makefile
 
 CC			= cc
 CFLAGS		= -Wall -Wextra -Werror -g
-INCLUDES	= -I./
+DFLAGS		= -MT $@ -MMD -MP
+INCLUDES	= -I./$(INCDIR)
 
 # -=-=-=-=-    TARGETS -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 
 all: $(NAME)
 
-$(NAME): $(OBJS) $(HEADER) $(SRCS) $(MAKE)
+$(NAME): $(OBJS) $(SRCS) $(MAKE)
+	@mkdir -p $(OBJDIR)
 	ar rcs $(NAME) $(OBJS)
 	
-%.o: %.c $(HEADER) $(MAKE)
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+$(OBJDIR)/%.o: $(SRCDIR)/%.c $(MAKE)
+	@mkdir -p $(OBJDIR)
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(DFLAGS) $(INCLUDES) -c $< -o $@
+	@mkdir -p $(DEPDIR)
+	@mv $(patsubst %.o,%.d,$@) $(subst $(OBJDIR),$(DEPDIR),$(@D))/
 	
 clean:
 	/bin/rm -f $(OBJS)
+	/bin/rm -f $(DEPS)
 
 fclean: clean
 	/bin/rm -f $(NAME)
 
 re: fclean all
+
+-include $(DEPS)
 
 .PHONY:  all clean fclean re
