@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 13:35:53 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 16:05:56 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/18 13:44:28 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static t_symbol_node **create_array(t_symbol_list *list)
 {
-    t_symbol_node **array = malloc((list->count * sizeof(t_symbol_node *)) + 1);
+    t_symbol_node **array = malloc((sizeof(t_symbol_node *)) * (list->count + 1));
     if (!array)
         return NULL;
 
@@ -45,23 +45,11 @@ static void rebuild_list_from_array(t_symbol_list *list, t_symbol_node **array)
         current->next = NULL;
 }
 
-static int compare_symbols(const void *a, const void *b)
+static int compare_symbols(const void *a, const void *b, unsigned char flags)
 {
     t_symbol_node *sym_a = *(t_symbol_node **)a;
     t_symbol_node *sym_b = *(t_symbol_node **)b;
 
-/*     int a_no_addr = (sym_a->symbol.type == 'U' || sym_a->symbol.type == 'u' ||
-                     sym_a->symbol.type == 'w' || sym_a->symbol.type == 'W' ||
-                     sym_a->symbol.type == 'N');
-    int b_no_addr = (sym_b->symbol.type == 'U' || sym_b->symbol.type == 'u' ||
-                     sym_b->symbol.type == 'w' || sym_b->symbol.type == 'W' ||
-                     sym_b->symbol.type == 'N');
-
-    // Les symboles sans adresse viennent en premier
-    if (a_no_addr != b_no_addr)
-        return a_no_addr - b_no_addr; */
-    
-    // Trim leading underscores for comparison
     char *name_a = ft_strtrim(sym_a->symbol.name, "_.");
     char *name_b = ft_strtrim(sym_b->symbol.name, "_.");
     if (!name_a || !name_b)
@@ -75,31 +63,34 @@ static int compare_symbols(const void *a, const void *b)
     free(name_b);
 
     if (result == 0) {
+        if (sym_a->symbol.type == 'a' && sym_b->symbol.type != 'a')
+            return 1;
+        if (sym_a->symbol.type != 'a' && sym_b->symbol.type == 'a')
+            return -1;
         if (sym_a->symbol.type > sym_b->symbol.type)
             return 1;
-        else if (sym_a->symbol.type <= sym_b->symbol.type)
+        else if (sym_a->symbol.type < sym_b->symbol.type)
+            return -1;
+        if (sym_a->symbol.value > sym_b->symbol.value)
+            return 1;
+        else if (sym_a->symbol.value < sym_b->symbol.value)
             return -1;
     }
-
-    return result;
-}
-
-static int compare_symbols_reverse(const void *a, const void *b)
-{
-    return compare_symbols(b, a); // Reverse the order of comparison
+    
+    return (flags & FLAG_R) ? -result : result;
 }
 
 static void sort_symbols_in_array(t_symbol_node ***array, size_t count, unsigned char flags)
 {
-    int (*cmp)(const void *, const void *);
+    int (*cmp)(const void *, const void *, unsigned char) = NULL;
     
-    cmp = (flags & FLAG_R) ? compare_symbols_reverse : compare_symbols;
+    cmp = compare_symbols;
     
     for (size_t i = 0; i < count; i++)
     {
         for (size_t j = i + 1; j < count; j++)
         {
-            if (cmp(&(*array)[i], &(*array)[j]) > 0)
+            if (cmp(&(*array)[i], &(*array)[j], flags) > 0)
             {
                 t_symbol_node *tmp = (*array)[i];
                 (*array)[i] = (*array)[j];

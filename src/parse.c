@@ -6,23 +6,11 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/16 17:38:19 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/18 15:33:08 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/nm.h"
-
-static void	print_usage(void)
-{
-	ft_putstr_fd("Usage: ft_nm [options] <file>...\n", 2);
-	ft_putstr_fd("Options:\n", 2);
-	ft_putstr_fd("  -a, --debug-syms	Display all symbols, even debugger-only symbols\n", 2);
-	ft_putstr_fd("  -g, --extern-only  	Only external symbols\n", 2);
-	ft_putstr_fd("  -u, --undefined-only	Only undefined symbols\n", 2);
-	ft_putstr_fd("  -r, --reverse-sort    Sort in reverse order\n", 2);
-	ft_putstr_fd("  -p, --no-sort       	Do not sort\n", 2);
-	exit(1);
-}
 
 static void invalid_option_error(char flag_char, char *flag_str)
 {
@@ -34,25 +22,19 @@ static void invalid_option_error(char flag_char, char *flag_str)
 		ft_putstr_fd(flag_str, 2);
 	ft_putendl_fd("'", 2);
 	ft_putstr_fd(RESET, 1);
-	print_usage();
+	nm_print_usage();
 }
 
 static void parse_short_flags(unsigned char *flags, char flag_char)
 {
 	if (flag_char == 'a') {
 		*flags |= FLAG_A;
-		*flags &= ~FLAG_G;
-		*flags &= ~FLAG_U;
 	}
 	else if (flag_char == 'g') {
 		*flags |= FLAG_G;
-		*flags &= ~FLAG_A;
-		*flags &= ~FLAG_U;
 	}
 	else if (flag_char == 'u') {
 		*flags |= FLAG_U;
-		*flags &= ~FLAG_A;
-		*flags &= ~FLAG_G;
 	}
 	else if (flag_char == 'r') {
 		*flags |= FLAG_R;
@@ -73,18 +55,12 @@ static void parse_long_flags(unsigned char *flags, char *flag_str)
 
 	if (ft_strcmp(flag_str, "debug-syms") == 0) {
 		*flags |= FLAG_A;
-		*flags &= ~FLAG_G;
-		*flags &= ~FLAG_U;
 	}
 	else if (ft_strcmp(flag_str, "extern-only") == 0) {
 		*flags |= FLAG_G;
-		*flags &= ~FLAG_A;
-		*flags &= ~FLAG_U;
 	}
 	else if (ft_strcmp(flag_str, "undefined-only") == 0) {
 		*flags |= FLAG_U;
-		*flags &= ~FLAG_A;
-		*flags &= ~FLAG_G;
 	}
 	else if (ft_strcmp(flag_str, "reverse-sort") == 0) {
 		*flags |= FLAG_R;
@@ -127,8 +103,6 @@ static void	parse_flags(int argc, char **argv, t_nm *nm)
 		j = 1;
 	}
 	nm->file_count = argc - total_flags - 1;
-/* 	ft_printf("[DEBUG] Number of flags: %d\n", total_flags);
-	ft_printf("[DEBUG] Number of files to process: %d\n", nm->file_count); */
 }
 
 static void	get_default_filename(t_nm *nm)
@@ -163,7 +137,6 @@ static void	parse_files(char **argv, t_nm *nm)
 		if (!nm->files[file_index].filename)
 			nm_error("memory allocation failed");
 
-		// ft_printf("[DEBUG] Parsed file: %s\n", nm->files[file_index].filename);
 		i++;
 		file_index++;
 	}
@@ -175,11 +148,9 @@ void	nm_parse_args(int argc, char **argv, t_nm *nm)
 	parse_flags(argc, argv, nm);
 
 	if (nm->file_count == 0) {
-		// ft_printf("%s[DEBUG] No files specified, will default to a.out%s\n", YELLOW, RESET);
 		get_default_filename(nm);
 	}
 	else {
-		// ft_printf("[DEBUG] Files to process: %d\n", nm->file_count);
 		parse_files(argv, nm);
 	}
 

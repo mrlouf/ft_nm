@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/17 15:29:47 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/18 14:51:52 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <elf.h>
 # include <errno.h>
 
-# include "../libft/libft.h"
+# include "../libft/src/libft.h"
 
 # define YELLOW "\033[33m"
 # define RED "\033[31m"
@@ -53,6 +53,7 @@ typedef struct s_symbol {
     uint64_t        value;
     char            type;
     char            *name;
+	int				index;
 
 	uint64_t    	size;
     unsigned char 	bind;
@@ -128,9 +129,11 @@ void	nm_process_files(t_nm *nm);
 void	nm_sort_symbols(t_symbol_list *list, unsigned char flags);
 void	nm_print_symbols(t_file *file, unsigned char flags);
 
+void	nm_print_usage(void);
 void	nm_error(const char *msg);
 void	nm_warning(const char *msg, const char *detail);
 
+int		nm_strcasecmp(const char *s1, const char *s2);
 void	nm_unmap_file(t_file *file);
 void	nm_cleanup(t_nm *nm);
 

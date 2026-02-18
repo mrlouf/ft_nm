@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 14:05:55 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 16:03:31 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/18 12:59:31 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ static int	parse_elf_headers(t_file *file)
 {
 	unsigned char *e_ident = (unsigned char *)file->data;
 
-	if (e_ident[EI_DATA] != ELFDATA2LSB) {
+	if (e_ident[EI_DATA] == ELFDATA2MSB) {
 		nm_warning(file->filename, ": big-endian files are not supported");
 		return (1);
 	}
@@ -278,9 +278,10 @@ static char get_symbol64_type(Elf64_Sym *sym, Elf64_Shdr *shdr_table, Elf64_Ehdr
 static void extract_symbols(t_file *file, unsigned char flags)
 {
     find_symtab(file);
+
     if ((file->elf_class == ELFCLASS64 && file->u.file64.symtab == NULL)
 	|| (file->elf_class == ELFCLASS32 && file->u.file32.symtab == NULL)) {
-        ft_printf("ft_nm: %s: no symbol\n", file->filename);
+		nm_warning(file->filename, ": no symbol");
         return;
     }
 
@@ -292,6 +293,7 @@ static void extract_symbols(t_file *file, unsigned char flags)
 				
 			t_symbol symbol;
 
+			symbol.index = i;
 			symbol.value = sym32->st_value;
 			symbol.size = sym32->st_size;
 			symbol.bind = ELF32_ST_BIND(sym32->st_info);
@@ -318,6 +320,7 @@ static void extract_symbols(t_file *file, unsigned char flags)
 			
 			t_symbol symbol;
 
+			symbol.index = i;
 			symbol.value = sym64->st_value;
 			symbol.size = sym64->st_size;
 			symbol.bind = ELF64_ST_BIND(sym64->st_info);
@@ -363,6 +366,10 @@ void nm_process_files(t_nm *nm)
 		extract_symbols(&nm->files[i], nm->flags);
 
 		nm_sort_symbols(&nm->files[i].symbols, nm->flags);
+		
+		if (nm->file_count > 1)
+			ft_printf("\n%s:\n", nm->files[i].filename);
+		
 		nm_print_symbols(&nm->files[i], nm->flags);
 		nm_unmap_file(&nm->files[i]);
 
