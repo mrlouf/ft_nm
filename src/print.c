@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 13:14:12 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/18 11:55:13 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/18 13:03:14 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static int symbol_should_be_skipped(t_symbol *sym, unsigned char flags)
 
 static void print_address(t_file *file, t_symbol *sym)
 {
-    char value[17] = { 0 };
+    char value[17];
     ft_memset(value, '0', 16);
     value[16] = '\0';
 
@@ -61,7 +61,6 @@ static void print_address(t_file *file, t_symbol *sym)
     else if (file->elf_class == ELFCLASS64) {
         ft_printf("%s", value);
     }
-
 }
 
 static void print_values(t_file *file, t_symbol *sym)

@@ -296,7 +296,29 @@ echo ""
 echo "Testing combined flags..."
 echo ""
 
-flag_combos=("-rg" "-ag" "-ru" "-au" "-rp" "-agrup")
+flag_combos=(
+    # 2 flags
+    "-ag" "-ar" "-ap" "-au"
+    "-gr" "-gp" "-gu"
+    "-rp" "-ru"
+    "-pu"
+    
+    # 3 flags
+    "-agr" "-agp" "-agu"
+    "-arp" "-aru"
+    "-apu"
+    "-grp" "-gru"
+    "-gpu"
+    "-rpu"
+    
+    # 4 flags
+    "-agrp" "-agru" "-agpu"
+    "-arpu"
+    "-grpu"
+    
+    # 5 flags
+    "-agrpu"
+)
 
 for combo in "${flag_combos[@]}"; do
     ./ft_nm $combo ft_nm .obj/*.o > ./test_files/test1

@@ -6,7 +6,7 @@
 #    By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#              #
-#    Updated: 2026/02/17 13:14:55 by nicolas          ###   ########.fr        #
+#    Updated: 2026/02/18 13:06:35 by nicolas          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,7 @@ DEPDIRS		= $(DEPDIR)
 LIBFT		= $(LIBFT_DIR)/libft.a
 
 CC			= cc
-CFLAGS		= -Wall -Wextra -Werror -g# -fsanitize=address
+CFLAGS		= -Wall -Wextra -Werror -g -fsanitize=address
 INCLUDES	= -I$(INC_DIR) -I$(LIBFT_DIR)
 LDFLAGS		= -L$(LIBFT_DIR) -lft
 DFLAGS		= -MT $@ -MMD -MP
