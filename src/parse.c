@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:08:09 by nponchon          #+#    #+#             */
-/*   Updated: 2026/02/18 14:06:13 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/18 15:33:08 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,18 +29,12 @@ static void parse_short_flags(unsigned char *flags, char flag_char)
 {
 	if (flag_char == 'a') {
 		*flags |= FLAG_A;
-		// *flags &= ~FLAG_G;
-		// *flags &= ~FLAG_U;
 	}
 	else if (flag_char == 'g') {
 		*flags |= FLAG_G;
-		// *flags &= ~FLAG_A;
-		// *flags &= ~FLAG_U;
 	}
 	else if (flag_char == 'u') {
 		*flags |= FLAG_U;
-		// *flags &= ~FLAG_A;
-		// *flags &= ~FLAG_G;
 	}
 	else if (flag_char == 'r') {
 		*flags |= FLAG_R;
@@ -61,18 +55,12 @@ static void parse_long_flags(unsigned char *flags, char *flag_str)
 
 	if (ft_strcmp(flag_str, "debug-syms") == 0) {
 		*flags |= FLAG_A;
-		// *flags &= ~FLAG_G;
-		// *flags &= ~FLAG_U;
 	}
 	else if (ft_strcmp(flag_str, "extern-only") == 0) {
 		*flags |= FLAG_G;
-		// *flags &= ~FLAG_A;
-		// *flags &= ~FLAG_U;
 	}
 	else if (ft_strcmp(flag_str, "undefined-only") == 0) {
 		*flags |= FLAG_U;
-		// *flags &= ~FLAG_A;
-		// *flags &= ~FLAG_G;
 	}
 	else if (ft_strcmp(flag_str, "reverse-sort") == 0) {
 		*flags |= FLAG_R;
