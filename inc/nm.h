@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 13:57:00 by mrlouf            #+#    #+#             */
-/*   Updated: 2026/02/17 16:33:42 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/18 11:42:34 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ typedef struct s_symbol {
     uint64_t        value;
     char            type;
     char            *name;
+	int				index;
 
 	uint64_t    	size;
     unsigned char 	bind;

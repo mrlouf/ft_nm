@@ -6,7 +6,7 @@
 /*   By: nicolas <nicolas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 13:14:12 by nicolas           #+#    #+#             */
-/*   Updated: 2026/02/17 18:21:37 by nicolas          ###   ########.fr       */
+/*   Updated: 2026/02/18 11:55:13 by nicolas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,9 @@ static void print_address(t_file *file, t_symbol *sym)
         tmp_value /= 16;
         i++;
     }
+
+	// This gives for example "0000000000000abc" for any symbol
+	// we then skip the 8 first leading zeroes if it's a 32-bit symbol
 
     if (file->elf_class == ELFCLASS32) {
         ft_printf("%s", value + 8);

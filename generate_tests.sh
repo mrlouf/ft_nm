@@ -238,15 +238,14 @@ rm -fr ./test_files/*
 #        32-bit ELF tests      #
 ################################
 
-echo "Creating 32-bit ELF test file..."
+echo -n "Creating 32-bit ELF test file..."
 
 echo 'int main() { return 0; }' > ./test_files/test.c
 
 gcc -m32 ./test_files/test.c -o ./test_files/elf32 2>/dev/null
 
 if [ -f ./test_files/elf32 ]; then
-    echo "$GREEN 32-bit ELF test file created successfully $RESET"
-    echo "Testing 32-bit ELF file..."
+    echo " created, running tests..."
     echo ""
 
     ./ft_nm ./test_files/elf32 > ./test_files/test1;
@@ -261,7 +260,8 @@ if [ -f ./test_files/elf32 ]; then
         PASSED_TESTS=$((PASSED_TESTS + 1))
     fi
 else
-    echo "$RED Failed to create 32-bit ELF test file, skipping test... $RESET"
+    echo ""
+    echo "$RED Failed to create 32-bit ELF test file, skipping test $RESET"
     exit 1
 fi
 
@@ -299,8 +299,8 @@ echo ""
 flag_combos=("-rg" "-ag" "-ru" "-au" "-rp" "-agrup")
 
 for combo in "${flag_combos[@]}"; do
-    ./ft_nm $combo ft_nm > ./test_files/test1
-    nm $combo ft_nm > ./test_files/test2
+    ./ft_nm $combo ft_nm .obj/*.o > ./test_files/test1
+    nm $combo ft_nm .obj/*.o > ./test_files/test2
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     if ! diff -q ./test_files/test1 ./test_files/test2 > /dev/null; then
         echo "${RED} Test failed for flags $combo${RESET}"
