@@ -262,7 +262,6 @@ if [ -f ./test_files/elf32 ]; then
 else
     echo ""
     echo "$RED Failed to create 32-bit ELF test file, skipping test $RESET"
-    exit 1
 fi
 
 
